@@ -68,6 +68,10 @@ class App extends Component {
         <div>
           This is Ivan's feature
         </div>
+
+        <div>
+          <button >haha</button>
+        </div>
       </div>
     );
   }
