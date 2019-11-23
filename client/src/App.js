@@ -65,6 +65,9 @@ class App extends Component {
           Try changing the value stored on <strong>line 40</strong> of App.js.
         </p>
         <div>The stored value is: {this.state.storageValue}</div>
+        <div>
+          This is Ivan's feature
+        </div>
       </div>
     );
   }
