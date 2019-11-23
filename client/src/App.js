@@ -66,7 +66,7 @@ class App extends Component {
         </p>
         <div>The stored value is: {this.state.storageValue}</div>
         <div>
-          This is Ivan's feature
+          this is belong's box
         </div>
 
         <div>
