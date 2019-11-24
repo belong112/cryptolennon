@@ -4,9 +4,32 @@ import getWeb3 from "./getWeb3";
 
 import "./App.css";
 
-class App extends Component {
-  state = { storageValue: 0, web3: null, accounts: null, contract: null };
+var items = [{
+          agree: true,
+          text: "兩國的文化已經漸行漸遠，實屬沒必要強迫兩國統一。"
+        },
+        {
+          agree: true,
+          text: "我認為台灣擁有很多對岸沒有的，我實在不想被統一。"
+        },
+        {
+          agree: false,
+          text: "區區灣灣人民，別忘了你們的老祖先，都是從中國而來，現在回歸祖國懷抱，豈能不答應?"
+        }]
 
+class App extends Component {
+   constructor (props) {
+    super(props);
+    this.state = { 
+      storageValue: 0, 
+      web3: null, 
+      accounts: null, 
+      contract: null, 
+      items: [],
+      textarea: "",
+      agree: true
+    };
+  }
   componentDidMount = async () => {
     try {
       // Get network provider and web3 instance.
@@ -25,7 +48,7 @@ class App extends Component {
 
       // Set web3, accounts, and contract to the state, and then proceed with an
       // example of interacting with the contract's methods.
-      this.setState({ web3, accounts, contract: instance }, this.runExample);
+      this.setState({ web3, accounts, contract: instance, items:items});
     } catch (error) {
       // Catch any errors for any of the above operations.
       alert(
@@ -39,7 +62,7 @@ class App extends Component {
     const { accounts, contract } = this.state;
 
     // Stores a given value, 5 by default.
-    await contract.methods.set(5).send({ from: accounts[0] });
+    await contract.methods.set(1000).send({ from: accounts[0] });
 
     // Get the value from the contract to prove it worked.
     const response = await contract.methods.get().call();
@@ -48,29 +71,88 @@ class App extends Component {
     this.setState({ storageValue: response });
   };
 
+  handleOnchange = (e) =>{
+    this.setState({
+      textarea: e.target.value
+    })
+  }
+
+  handleRadio = (e) =>{
+    if(e.target.value == 'y')
+      this.setState({
+        agree: true
+      })
+    else if(e.target.value == 'n')
+      this.setState({
+        agree: false
+      })
+  }
+
+  onSubmit = () => {
+    console.log("hello");
+    const {agree,textarea} = this.state
+    if (textarea == "")
+      alert("你還沒寫下意見")
+    else if (agree == null)
+      alert('你還沒選擇支持或反對')
+    else  
+      items.unshift({
+        agree:agree,
+        text:textarea
+      });
+    
+    this.setState({
+      items:items,
+      agree:null,
+      textarea:""
+    });
+  }
+
   render() {
     if (!this.state.web3) {
       return <div>Loading Web3, accounts, and contract...</div>;
     }
-    return (
-      <div className="App">
-        <h1>Good to Go!</h1>
-        <p>Your Truffle Box is installed and ready.</p>
-        <h2>Smart Contract Example</h2>
-        <p>
-          If your contracts compiled and migrated successfully, below will show
-          a stored value of 5 (by default).
-        </p>
-        <p>
-          Try changing the value stored on <strong>line 40</strong> of App.js.
-        </p>
-        <div>The stored value is: {this.state.storageValue}</div>
-        <div>
-          this is belong's box
-        </div>
 
-        <div>
-          <button >haha</button>
+    const { items } = this.state;
+    const replys = items.map(item =>{
+      if (item.agree) {
+      return(
+        <div className="border border-success text-left p-2 m-2">
+          <h4>支持</h4>
+          <p>{item.text}</p>
+        </div>
+      )}
+
+      else{
+        return(
+        <div className="border border-danger text-left p-2 m-2">
+          <h4>反對</h4>
+          <p>{item.text}</p>
+        </div>
+      )}
+    })
+
+    return (
+      <div className="App m-5">
+        <h1>你支持一國兩制嗎?</h1>
+        {replys}
+
+        <div className="border p-2 m-2">
+          <h3>發表你的看法吧</h3>
+          <div>
+            <div className="form-check form-check-inline">
+              <input className="form-check-input" type="radio" name='agree' value='y' onChange={this.handleRadio} checked/>
+              <label className="form-check-label text-success" for="inlineRadio1">支持</label>
+            </div>
+            <div className="form-check form-check-inline">
+              <input className="form-check-input" type="radio" name='agree' value='n' onChange={this.handleRadio}/>
+              <label className="form-check-label text-danger" for="inlineRadio2">反對</label>
+            </div>
+             <div className="form-group">
+              <textarea className="form-control" value={this.state.textarea} onChange={this.handleOnchange} placeholder="寫些什麼..." rows="3"></textarea>
+            </div>  
+            <button onClick={this.onSubmit} className="btn btn-primary">submit</button>          
+          </div>
         </div>
       </div>
     );
