@@ -6,15 +6,21 @@ import "./App.css";
 
 var items = [{
           agree: 'y',
-          text: "兩國的文化已經漸行漸遠，實屬沒必要強迫兩國統一。"
+          text: "兩國的文化已經漸行漸遠，實屬沒必要強迫兩國統一。",
+          age: 22,
+          name: "石牌小雞雞"
         },
         {
           agree: 'y',
-          text: "我認為台灣擁有很多對岸沒有的，我實在不想被統一。"
+          text: "我認為台灣擁有很多對岸沒有的，我實在不想被統一。",
+          age: 16,
+          name: '東區劉德華'
         },
         {
           agree: 'f',
-          text: "區區灣灣人民，別忘了你們的老祖先，都是從中國而來，現在回歸祖國懷抱，豈能不答應?"
+          text: "區區灣灣人民，別忘了你們的老祖先，都是從中國而來，現在回歸祖國懷抱，豈能不答應?",
+          age: 53,
+          name: "韓家軍100號子弟兵"
         }]
 
 class App extends Component {
@@ -27,7 +33,9 @@ class App extends Component {
       contract: null, 
       items: [],
       textarea: "",
-      agree: null
+      agree: null,
+      user: "鄭伊人",
+      userage: 22
     };
   }
   componentDidMount = async () => {
@@ -93,7 +101,9 @@ class App extends Component {
     else  
       items.unshift({
         agree:agree,
-        text:textarea
+        text:textarea,
+        name:this.state.user,
+        age:this.state.userage,
       });
     
     this.setState({
@@ -115,6 +125,7 @@ class App extends Component {
         <div className="border border-success text-left p-2 m-2">
           <h4>支持</h4>
           <p>{item.text}</p>
+          <span className="text-secondary">{item.age || "?"}歲，{item.name||"?"}</span>
         </div>
       )}
 
@@ -123,30 +134,47 @@ class App extends Component {
         <div className="border border-danger text-left p-2 m-2">
           <h4>反對</h4>
           <p>{item.text}</p>
+          <span className="text-secondary">{item.age||"?"}歲，{item.name||"?"}</span>
         </div>
       )}
     })
 
     return (
-      <div className="App m-5">
-        <h1>你支持一國兩制嗎?</h1>
-        {replys}
+      <div className='App container'>
+        <header className="blog-header py-3">
+          <div className="row flex-nowrap justify-content-between align-items-center">
+            <div className="col-4 pt-1">
+              <span className="text-muted">早安，{this.state.user}</span>
+            </div>
+            <div className="col-4 text-center">
+              <h3 className="blog-header-logo text-dark">Crypto-LennonWall</h3>
+            </div>
+            <div className="col-4 d-flex justify-content-end align-items-center">              
+              <a class="btn btn-sm btn-outline-secondary" href="#">Sign up</a>
+            </div>
+          </div>
+        </header>
+        <div> 
+          <h6>每日一問:</h6>       
+          <h1>你支持一國兩制嗎?</h1>
+          {replys}
 
-        <div className="border p-2 m-2">
-          <h3>發表你的看法吧</h3>
-          <div>
-            <div className="form-check form-check-inline">
-              <input className="form-check-input" type="radio" name='agree' value='y' onChange={this.handleRadio} checked={this.state.agree === 'y'} />
-              <label className="form-check-label text-success" for="inlineRadio1">支持</label>
+          <div className="border p-2 m-2">
+            <h3>發表你的看法吧</h3>
+            <div>
+              <div className="form-check form-check-inline">
+                <input className="form-check-input" type="radio" name='agree' value='y' onChange={this.handleRadio} checked={this.state.agree === 'y'} />
+                <label className="form-check-label text-success" for="inlineRadio1">支持</label>
+              </div>
+              <div className="form-check form-check-inline">
+                <input className="form-check-input" type="radio" name='agree' value='f' onChange={this.handleRadio} checked={this.state.agree === 'f'}/>
+                <label className="form-check-label text-danger" for="inlineRadio2">反對</label>
+              </div>
+               <div className="form-group">
+                <textarea className="form-control" value={this.state.textarea} onChange={this.handleOnchange} placeholder="寫些什麼..." rows="3"></textarea>
+              </div>  
+              <button onClick={this.onSubmit} className="btn btn-primary">submit</button>          
             </div>
-            <div className="form-check form-check-inline">
-              <input className="form-check-input" type="radio" name='agree' value='f' onChange={this.handleRadio} checked={this.state.agree === 'f'}/>
-              <label className="form-check-label text-danger" for="inlineRadio2">反對</label>
-            </div>
-             <div className="form-group">
-              <textarea className="form-control" value={this.state.textarea} onChange={this.handleOnchange} placeholder="寫些什麼..." rows="3"></textarea>
-            </div>  
-            <button onClick={this.onSubmit} className="btn btn-primary">submit</button>          
           </div>
         </div>
       </div>
