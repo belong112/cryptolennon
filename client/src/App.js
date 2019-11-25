@@ -1,6 +1,8 @@
 import React, { Component } from "react";
 import SimpleStorageContract from "./contracts/SimpleStorage.json";
 import getWeb3 from "./getWeb3";
+import Header from "./Header.js"
+import Footer from "./Footer.js"
 
 import "./App.css";
 
@@ -141,19 +143,7 @@ class App extends Component {
 
     return (
       <div className='App container'>
-        <header className="blog-header py-3">
-          <div className="row flex-nowrap justify-content-between align-items-center">
-            <div className="col-4 pt-1">
-              <span className="text-muted">早安，{this.state.user}</span>
-            </div>
-            <div className="col-4 text-center">
-              <h3 className="blog-header-logo text-dark">Crypto-LennonWall</h3>
-            </div>
-            <div className="col-4 d-flex justify-content-end align-items-center">              
-              <a class="btn btn-sm btn-outline-secondary" href="#">Sign up</a>
-            </div>
-          </div>
-        </header>
+        <Header user={this.state.user}/>
         <div> 
           <h6>每日一問:</h6>       
           <h1>你支持一國兩制嗎?</h1>
@@ -177,6 +167,7 @@ class App extends Component {
             </div>
           </div>
         </div>
+        <Footer/>
       </div>
     );
   }
