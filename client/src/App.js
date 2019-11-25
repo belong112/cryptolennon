@@ -5,15 +5,15 @@ import getWeb3 from "./getWeb3";
 import "./App.css";
 
 var items = [{
-          agree: true,
+          agree: 'y',
           text: "兩國的文化已經漸行漸遠，實屬沒必要強迫兩國統一。"
         },
         {
-          agree: true,
+          agree: 'y',
           text: "我認為台灣擁有很多對岸沒有的，我實在不想被統一。"
         },
         {
-          agree: false,
+          agree: 'f',
           text: "區區灣灣人民，別忘了你們的老祖先，都是從中國而來，現在回歸祖國懷抱，豈能不答應?"
         }]
 
@@ -27,7 +27,7 @@ class App extends Component {
       contract: null, 
       items: [],
       textarea: "",
-      agree: true
+      agree: null
     };
   }
   componentDidMount = async () => {
@@ -78,20 +78,15 @@ class App extends Component {
   }
 
   handleRadio = (e) =>{
-    if(e.target.value == 'y')
-      this.setState({
-        agree: true
-      })
-    else if(e.target.value == 'n')
-      this.setState({
-        agree: false
-      })
+    console.log(e.target.value)
+    this.setState({
+      agree: e.target.value
+    })
   }
 
   onSubmit = () => {
-    console.log("hello");
     const {agree,textarea} = this.state
-    if (textarea == "")
+    if (textarea === "")
       alert("你還沒寫下意見")
     else if (agree == null)
       alert('你還沒選擇支持或反對')
@@ -115,7 +110,7 @@ class App extends Component {
 
     const { items } = this.state;
     const replys = items.map(item =>{
-      if (item.agree) {
+      if (item.agree === 'y') {
       return(
         <div className="border border-success text-left p-2 m-2">
           <h4>支持</h4>
@@ -141,11 +136,11 @@ class App extends Component {
           <h3>發表你的看法吧</h3>
           <div>
             <div className="form-check form-check-inline">
-              <input className="form-check-input" type="radio" name='agree' value='y' onChange={this.handleRadio} checked/>
+              <input className="form-check-input" type="radio" name='agree' value='y' onChange={this.handleRadio} checked={this.state.agree === 'y'} />
               <label className="form-check-label text-success" for="inlineRadio1">支持</label>
             </div>
             <div className="form-check form-check-inline">
-              <input className="form-check-input" type="radio" name='agree' value='n' onChange={this.handleRadio}/>
+              <input className="form-check-input" type="radio" name='agree' value='f' onChange={this.handleRadio} checked={this.state.agree === 'f'}/>
               <label className="form-check-label text-danger" for="inlineRadio2">反對</label>
             </div>
              <div className="form-group">
