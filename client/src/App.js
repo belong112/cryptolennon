@@ -1,11 +1,15 @@
 import React, { Component } from "react";
+
 import SimpleStorageContract from "./contracts/SimpleStorage.json";
 import getWeb3 from "./getWeb3";
 import Header from "./Header.js"
+import Messagebox from "./Messagebox.js"
 import Footer from "./Footer.js"
+
 
 import "./App.css";
 
+var currentitems = []
 var items = [{
           id:'1574752132567',
           agree: 'y',
@@ -24,7 +28,7 @@ var items = [{
           age: 16,
           name: '東區劉德華',
           respond:{
-            "positive":10,
+            "positive":17,
             "negative":2
           }
         },
@@ -123,10 +127,15 @@ class App extends Component {
       alert('你還沒選擇支持或反對')
     else  
       items.unshift({
+        id: 15000 + (Math.random() * (1000)),
         agree:agree,
         text:textarea,
         name:user.name,
         age:user.age,
+        respond:{
+            "positive":0,
+            "negative":0
+          }
       });
     
     this.setState({
@@ -136,10 +145,33 @@ class App extends Component {
     });
   }
 
+  changefilter = (flitername) =>{
+    if(flitername === 'agree')
+      currentitems = items.filter((item)=>{
+        return item.agree === 'y';       // 取得大於五歲的
+      });
+    else if(flitername === 'disagree')
+      currentitems = items.filter((item)=>{
+        return item.agree === 'f';       // 取得大於五歲的
+      });
+    else if(flitername === 'all')
+      currentitems = items
+    else if(flitername === 'likes'){
+      console.log('w')
+      currentitems = items.sort((a, b) => (b.respond.positive) - (a.respond.positive));
+    }
+
+    this.setState({
+      items:currentitems
+    })
+  }
+
   handleCommentRespond = (id,respond) => {
     const {items,user} = this.state;
     const index = user.history.findIndex(item => item.id === id);
     const item = user.history[index];
+    const index2 = items.findIndex(item2 => item2.id === id);
+    const item2 = items[index2] 
     
 
     if (!item) {    // Not yet responded before
@@ -147,20 +179,43 @@ class App extends Component {
         id:id,
         respond:respond,
       });
-    } else {
-      if (item.respond === respond) {// 收回
+      if (respond == 'positive')
+        item2.respond.positive += 1;
+      else
+        item2.respond.negative += 1;
+    } 
+    else {
+      if (item.respond === respond) {   // 收回
         item.respond = null;
+        if (respond == 'positive')
+          item2.respond.positive -= 1;
+        else
+          item2.respond.negative -= 1;
       } 
-      else { 
+      else if(item.respond === null){  // 原本無
         item.respond = respond;
+        if (respond == 'positive')
+          item2.respond.positive += 1;
+        else
+          item2.respond.negative += 1;
+      }
+      else{                           //交換
+        item.respond = respond;
+        if (respond == 'positive'){
+          item2.respond.positive += 1;
+          item2.respond.negative -= 1;
+        }else{
+          item2.respond.negative += 1;
+          item2.respond.positive -= 1;
+        }
       }
       user.history.splice(index,1,item);
     } 
 
     this.setState({
       user:user,
-    });
-    
+      items:items
+    });   
   }
 
   render() {
@@ -168,39 +223,25 @@ class App extends Component {
       return <div>Loading Web3, accounts, and contract...</div>;
     }
 
-    const { items } = this.state;
+    const { items,user } = this.state;
     const replys = items.map((item,index) =>{
-      if (item.agree === 'y') {
+      const i = user.history.findIndex(userhistory => userhistory.id === item.id);
+      var respond = null
+      if(i>=0) respond = user.history[i].respond
+      
       return(
-        <div key={item.id} className="border border-success text-left p-2 m-2">
+        <div key={item.id} className={"border text-left p-2 m-2 " + (item.agree === 'y' ? 'border-success' : 'border-danger')}>
           <div>
-            <h4>支持</h4>
-            <p>{item.text}</p>
+            <h4>{(item.agree === 'y' ? '支持' : '反對')}</h4>
+            <p>{  item.text}</p>
             <span className="text-secondary">{item.age || "?"}歲，{item.name||"?"}</span>
           </div>
-
           <div className="button-container">
-            <button onClick={() => this.handleCommentRespond(item.id,'positive')}>推{item.respond.positive}</button>
-            <button onClick={() => this.handleCommentRespond(item.id,'negative')}>噓{item.respond.negative}</button>
+            <button className={"btn " + (respond === 'positive' ? 'btn-outline-success' : 'btn-outline-dark')} onClick={() => this.handleCommentRespond(item.id,'positive')}>推{item.respond.positive}</button>
+            <button className={"btn " + (respond === 'negative' ? 'btn-outline-danger' : 'btn-outline-dark')} onClick={() => this.handleCommentRespond(item.id,'negative')}>噓{item.respond.negative}</button>
           </div>
         </div>
-      )}
-
-      else{
-        return(
-        <div key={index} className="border border-danger text-left p-2 m-2">
-          <div>
-            <h4>反對</h4>
-            <p>{item.text}</p>
-            <span className="text-secondary">{item.age||"?"}歲，{item.name||"?"}</span>
-          </div>
-          <div className="button-container">
-            <button onClick={() => this.handleCommentRespond(item.id,'positive')}>推{item.respond.positive}</button>
-            <button onClick={() => this.handleCommentRespond(item.id,'negative')}>噓{item.respond.negative}</button>
-          </div>
-          
-        </div>
-      )}
+      )
     })
 
     return (
@@ -209,6 +250,13 @@ class App extends Component {
         <div> 
           <h6>每日一問:</h6>       
           <h1>你支持一國兩制嗎?</h1>
+          <div className="btn-group" role="group" aria-label="Basic example">
+            <button className="btn btn-outline-secondary disabled">fliter</button>
+            <button className="btn btn-secondary" onClick={() => this.changefilter('all')}>全部</button>
+            <button className="btn btn-secondary" onClick={() => this.changefilter('agree')}>支持方</button>
+            <button className="btn btn-secondary" onClick={() => this.changefilter('disagree')}>反對方</button>
+            <button className="btn btn-secondary" onClick={() => this.changefilter('likes')}>照讚數</button>
+          </div>
           {replys}
 
           <div className="border p-2 m-2">
