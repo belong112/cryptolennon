@@ -7,22 +7,37 @@ import Footer from "./Footer.js"
 import "./App.css";
 
 var items = [{
+          id:'1574752132567',
           agree: 'y',
           text: "兩國的文化已經漸行漸遠，實屬沒必要強迫兩國統一。",
           age: 22,
-          name: "石牌小雞雞"
+          name: "石牌小雞雞",
+          respond:{
+            "positive":3,
+            "negative":6
+          }
         },
         {
+          id:'1574752182674',
           agree: 'y',
           text: "我認為台灣擁有很多對岸沒有的，我實在不想被統一。",
           age: 16,
-          name: '東區劉德華'
+          name: '東區劉德華',
+          respond:{
+            "positive":10,
+            "negative":2
+          }
         },
         {
+          id:'1574752232922',
           agree: 'f',
           text: "區區灣灣人民，別忘了你們的老祖先，都是從中國而來，現在回歸祖國懷抱，豈能不答應?",
           age: 53,
-          name: "韓家軍100號子弟兵"
+          name: "韓家軍100號子弟兵",
+          respond:{
+            "positive":10,
+            "negative":9
+          }
         }]
 
 class App extends Component {
@@ -36,8 +51,14 @@ class App extends Component {
       items: [],
       textarea: "",
       agree: null,
-      user: "鄭伊人",
-      userage: 22
+      user: {
+        name:"鄭伊人",
+        age: 22,
+        history:[ // record user's respond to each comment
+          {id:'1574752132567',respond:'positive'},
+        ]
+      },
+      
     };
   }
   componentDidMount = async () => {
@@ -95,17 +116,17 @@ class App extends Component {
   }
 
   onSubmit = () => {
-    const {agree,textarea} = this.state
+    const {textarea,agree,user} = this.state
     if (textarea === "")
       alert("你還沒寫下意見")
-    else if (agree == null)
+    else if (agree === null)
       alert('你還沒選擇支持或反對')
     else  
       items.unshift({
         agree:agree,
         text:textarea,
-        name:this.state.user,
-        age:this.state.userage,
+        name:user.name,
+        age:user.age,
       });
     
     this.setState({
@@ -115,28 +136,69 @@ class App extends Component {
     });
   }
 
+  handleCommentRespond = (id,respond) => {
+    const {items,user} = this.state;
+    const index = user.history.findIndex(item => item.id === id);
+    const item = user.history[index];
+    
+
+    if (!item) {    // Not yet responded before
+      user.history.push({
+        id:id,
+        respond:respond,
+      });
+    } else {
+      if (item.respond === respond) {// 收回
+        item.respond = null;
+      } 
+      else { 
+        item.respond = respond;
+      }
+      user.history.splice(index,1,item);
+    } 
+
+    this.setState({
+      user:user,
+    });
+    
+  }
+
   render() {
     if (!this.state.web3) {
       return <div>Loading Web3, accounts, and contract...</div>;
     }
 
     const { items } = this.state;
-    const replys = items.map(item =>{
+    const replys = items.map((item,index) =>{
       if (item.agree === 'y') {
       return(
-        <div className="border border-success text-left p-2 m-2">
-          <h4>支持</h4>
-          <p>{item.text}</p>
-          <span className="text-secondary">{item.age || "?"}歲，{item.name||"?"}</span>
+        <div key={item.id} className="border border-success text-left p-2 m-2">
+          <div>
+            <h4>支持</h4>
+            <p>{item.text}</p>
+            <span className="text-secondary">{item.age || "?"}歲，{item.name||"?"}</span>
+          </div>
+
+          <div className="button-container">
+            <button onClick={() => this.handleCommentRespond(item.id,'positive')}>推{item.respond.positive}</button>
+            <button onClick={() => this.handleCommentRespond(item.id,'negative')}>噓{item.respond.negative}</button>
+          </div>
         </div>
       )}
 
       else{
         return(
-        <div className="border border-danger text-left p-2 m-2">
-          <h4>反對</h4>
-          <p>{item.text}</p>
-          <span className="text-secondary">{item.age||"?"}歲，{item.name||"?"}</span>
+        <div key={index} className="border border-danger text-left p-2 m-2">
+          <div>
+            <h4>反對</h4>
+            <p>{item.text}</p>
+            <span className="text-secondary">{item.age||"?"}歲，{item.name||"?"}</span>
+          </div>
+          <div className="button-container">
+            <button onClick={() => this.handleCommentRespond(item.id,'positive')}>推{item.respond.positive}</button>
+            <button onClick={() => this.handleCommentRespond(item.id,'negative')}>噓{item.respond.negative}</button>
+          </div>
+          
         </div>
       )}
     })
