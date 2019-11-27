@@ -179,7 +179,7 @@ class App extends Component {
         id:id,
         respond:respond,
       });
-      if (respond == 'positive')
+      if (respond === 'positive')
         item2.respond.positive += 1;
       else
         item2.respond.negative += 1;
@@ -187,21 +187,21 @@ class App extends Component {
     else {
       if (item.respond === respond) {   // 收回
         item.respond = null;
-        if (respond == 'positive')
+        if (respond === 'positive')
           item2.respond.positive -= 1;
         else
           item2.respond.negative -= 1;
       } 
       else if(item.respond === null){  // 原本無
         item.respond = respond;
-        if (respond == 'positive')
+        if (respond === 'positive')
           item2.respond.positive += 1;
         else
           item2.respond.negative += 1;
       }
       else{                           //交換
         item.respond = respond;
-        if (respond == 'positive'){
+        if (respond === 'positive'){
           item2.respond.positive += 1;
           item2.respond.negative -= 1;
         }else{
