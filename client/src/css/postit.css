@@ -1,0 +1,26 @@
+button:focus {
+  outline: none;
+}
+
+.note{
+	padding: 20px;
+	box-shadow: 0 5px 5px 2px rgba(0,0,0,0.3);
+	height: 300px;
+}
+.yellow{
+	background: #fff9c4;
+}
+.pink{
+	background: #f8bbd0;
+}
+.blue{
+	background: #b3e5fc;
+}
+.green{
+	background: #B8E986;
+}
+
+.buttongroup{
+	position: absolute;
+	bottom: 0;
+}

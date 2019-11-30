@@ -14,7 +14,7 @@ class Header extends Component {
           </div>
           <div className="col-4 d-flex justify-content-end align-items-center">
             <i className="fas fa-home"></i>
-            <button className="btn btn-sm btn-outline-secondary"><NavLink style={{ textDecoration: 'none' }} to="/">home page</NavLink></button>
+            <NavLink className="btn btn-sm btn-outline-secondary" style={{ textDecoration: 'none' }} to="/">home page</NavLink>
           </div>
         </div>
       </header>

@@ -2,7 +2,7 @@ import React, { Component } from "react";
 
 import SimpleStorageContract from "../contracts/SimpleStorage.json";
 import getWeb3 from "../getWeb3";
-import Messagebox from "../components/Messagebox.js"
+import PostIt from "../components/PostIt.js"
 
 import "../App.css";
 
@@ -14,6 +14,7 @@ var items = [{
           text: "兩國的文化已經漸行漸遠，實屬沒必要強迫兩國統一。",
           age: 22,
           name: "石牌小雞雞",
+          color: "yellow",
           respond:{
             "positive":3,
             "negative":6
@@ -25,6 +26,7 @@ var items = [{
           text: "我認為台灣擁有很多對岸沒有的，我實在不想被統一。",
           age: 16,
           name: '東區劉德華',
+          color: "green",
           respond:{
             "positive":17,
             "negative":2
@@ -36,6 +38,7 @@ var items = [{
           text: "區區灣灣人民，別忘了你們的老祖先，都是從中國而來，現在回歸祖國懷抱，豈能不答應?",
           age: 53,
           name: "韓家軍100號子弟兵",
+          color: "pink",
           respond:{
             "positive":10,
             "negative":9
@@ -82,7 +85,7 @@ class CommentBoard extends Component {
 
       // Set web3, accounts, and contract to the state, and then proceed with an
       // example of interacting with the contract's methods.
-      this.setState({ web3, accounts, contract: instance,items:items});
+      this.setState({ web3, accounts, contract: instance, items:items});
     } catch (error) {
       // Catch any errors for any of the above operations.
       alert(
@@ -131,6 +134,7 @@ class CommentBoard extends Component {
         text:textarea,
         name:user.name,
         age:user.age,
+        color: "blue",
         respond:{
             "positive":0,
             "negative":0
@@ -171,7 +175,6 @@ class CommentBoard extends Component {
     const item = user.history[index];
     const index2 = items.findIndex(item2 => item2.id === id);
     const item2 = items[index2] 
-    
 
     if (!item) {    // Not yet responded before
       user.history.push({
@@ -219,24 +222,14 @@ class CommentBoard extends Component {
 
   render() {
     const { items,user } = this.state;
-    const replys = items.map((item,index) =>{
+    const postIts = items.map((item,index) =>{
       const i = user.history.findIndex(userhistory => userhistory.id === item.id);
       var respond = null
       if(i>=0) respond = user.history[i].respond
-      
-      return(
-        <div key={item.id} className={"border text-left p-2 m-2 " + (item.agree === 'y' ? 'border-success' : 'border-danger')}>
-          <div>
-            <h4>{(item.agree === 'y' ? '支持' : '反對')}</h4>
-            <p>{  item.text}</p>
-            <span className="text-secondary">{item.age || "?"}歲，{item.name||"?"}</span>
-          </div>
-          <div className="button-container">
-            <button className={"btn " + (respond === 'positive' ? 'btn-outline-success' : 'btn-outline-dark')} onClick={() => this.handleCommentRespond(item.id,'positive')}>推{item.respond.positive}</button>
-            <button className={"btn " + (respond === 'negative' ? 'btn-outline-danger' : 'btn-outline-dark')} onClick={() => this.handleCommentRespond(item.id,'negative')}>噓{item.respond.negative}</button>
-          </div>
-        </div>
-      )
+
+        return(
+          <PostIt item={item} respond={respond} />
+        )
     })
 
     return (
@@ -244,14 +237,29 @@ class CommentBoard extends Component {
         <div> 
           <h6>每日一問:</h6>       
           <h1>你支持一國兩制嗎?</h1>
-          <div className="btn-group" role="group" aria-label="Basic example">
+          <div className="btn-group" role="group">
             <button className="btn btn-outline-secondary disabled">fliter</button>
             <button className="btn btn-secondary" onClick={() => this.changefilter('all')}>全部</button>
             <button className="btn btn-secondary" onClick={() => this.changefilter('agree')}>支持方</button>
             <button className="btn btn-secondary" onClick={() => this.changefilter('disagree')}>反對方</button>
             <button className="btn btn-secondary" onClick={() => this.changefilter('likes')}>照讚數</button>
           </div>
-          {replys}
+          <div className="input-group mb-3 col-4">
+            <div className="input-group-prepend">
+              <label className="input-group-text" for="inputGroupSelect01">Filter</label>
+            </div>
+            <select className="custom-select" id='inputGroupSelect01'>
+              <option value='0' selected>All</option>
+              <option value="1">Support</option>
+              <option value="2">Opposition</option>
+              <option value="3">By time</option>
+              <option value='4'>By likes</option>
+            </select>
+          </div>
+          <div className="row">
+            {postIts}
+          </div>
+
 
           <div className="border p-2 m-2">
             <h3>發表你的看法吧</h3>
