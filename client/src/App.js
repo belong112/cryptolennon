@@ -68,7 +68,7 @@ class App extends Component {
     const CommentPage = (props) => { return ( <CommentBoard  />)};
     return (
       <BrowserRouter> 
-        <div className='container App'>
+        <div className='App'>
           <Header/>
           <div>
             <Route exact path='/' component={Homepage} />

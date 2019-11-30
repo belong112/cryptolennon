@@ -108,7 +108,27 @@ class CommentBoard extends Component {
     this.setState({ storageValue: response });
   };
 
-  handleOnchange = (e) =>{
+  handleSelectOnchange = (e)=>{
+    console.log(e.target.value)
+    if(e.target.value === 'support')
+      currentitems = items.filter((item)=>{
+        return item.agree === 'y';       // 取得大於五歲的
+      });
+    else if(e.target.value === 'oppose')
+      currentitems = items.filter((item)=>{
+        return item.agree === 'f';       // 取得大於五歲的
+      });
+    else if(e.target.value === 'all')
+      currentitems = items
+    else if(e.target.value === 'likes'){
+      currentitems = items.sort((a, b) => (b.respond.positive) - (a.respond.positive));
+    }
+    this.setState({
+      items:currentitems
+    })
+  }
+
+  handleTxtOnchange = (e) =>{
     this.setState({
       textarea: e.target.value
     })
@@ -224,36 +244,30 @@ class CommentBoard extends Component {
     const { items,user } = this.state;
     const postIts = items.map((item,index) =>{
       const i = user.history.findIndex(userhistory => userhistory.id === item.id);
-      var respond = null
-      if(i>=0) respond = user.history[i].respond
+      var myRespond = null
+      if(i>=0) myRespond = user.history[i].respond
 
         return(
-          <PostIt item={item} respond={respond} />
+          <PostIt item={item} handleCommentRespond={(i,respond) => this.handleCommentRespond(i,respond)} respond={myRespond}/>
         )
     })
 
     return (
-      <div className='App container'>
+      <div className='container bg-light pb-5 pt-4'>
         <div> 
           <h6>每日一問:</h6>       
           <h1>你支持一國兩制嗎?</h1>
-          <div className="btn-group" role="group">
-            <button className="btn btn-outline-secondary disabled">fliter</button>
-            <button className="btn btn-secondary" onClick={() => this.changefilter('all')}>全部</button>
-            <button className="btn btn-secondary" onClick={() => this.changefilter('agree')}>支持方</button>
-            <button className="btn btn-secondary" onClick={() => this.changefilter('disagree')}>反對方</button>
-            <button className="btn btn-secondary" onClick={() => this.changefilter('likes')}>照讚數</button>
-          </div>
+          <hr/>   
           <div className="input-group mb-3 col-4">
             <div className="input-group-prepend">
-              <label className="input-group-text" for="inputGroupSelect01">Filter</label>
+              <label className="input-group-text" for="inputGroupSelect01">排序</label>
             </div>
-            <select className="custom-select" id='inputGroupSelect01'>
-              <option value='0' selected>All</option>
-              <option value="1">Support</option>
-              <option value="2">Opposition</option>
-              <option value="3">By time</option>
-              <option value='4'>By likes</option>
+            <select className="custom-select" id='inputGroupSelect01' onChange={this.handleSelectOnchange}>
+              <option value='all' selected>全部</option>
+              <option value="support">支持方</option>
+              <option value="oppose">反對方</option>
+              <option value="time">照時間</option>
+              <option value='likes'>照讚數</option>
             </select>
           </div>
           <div className="row">
@@ -273,7 +287,7 @@ class CommentBoard extends Component {
                 <label className="form-check-label text-danger" for="inlineRadio2">反對</label>
               </div>
                <div className="form-group">
-                <textarea className="form-control" value={this.state.textarea} onChange={this.handleOnchange} placeholder="寫些什麼..." rows="3"></textarea>
+                <textarea className="form-control" value={this.state.textarea} onChange={this.handleTxtOnchange} placeholder="寫些什麼..." rows="3"></textarea>
               </div>  
               <button onClick={this.onSubmit} className="btn btn-primary">submit</button>          
             </div>

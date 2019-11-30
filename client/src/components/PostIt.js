@@ -8,6 +8,11 @@ import ThumbDownIcon from '@material-ui/icons/ThumbDown';
 import "../css/postit.css"
 
 class PostIt extends Component {
+
+  handleCommentRespond = (id,respond) =>{
+    this.props.handleCommentRespond(id,respond)
+  }
+
   render() {    
     return (
       <div className="col-xl-3 col-lg-4 col-md-6 col-sm-6 my-3">
@@ -19,12 +24,12 @@ class PostIt extends Component {
             <div className="text-secondary">{this.props.item.age || "?"}歲，{this.props.item.name||"?"}</div>
           </div>
           <div className="buttongroup">
-            <IconButton spacing={2}>
+            <IconButton onClick={()=>{this.handleCommentRespond(this.props.item.id,'positive')}} spacing={2}>
               <Badge badgeContent={this.props.item.respond.positive} color="primary">
                 <ThumbUpIcon color={(this.props.respond === 'positive' ? 'primary':'')} />
               </Badge>
             </IconButton>
-            <IconButton spacing={2}>
+            <IconButton onClick={()=>{this.handleCommentRespond(this.props.item.id,"negative")}} spacing={2}>
               <Badge badgeContent={this.props.item.respond.negative} color="secondary">
                 <ThumbDownIcon color={(this.props.respond === 'negative' ? 'secondary':'')} />
               </Badge>
