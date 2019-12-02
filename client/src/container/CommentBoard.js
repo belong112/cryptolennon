@@ -2,58 +2,25 @@ import React, { Component } from "react";
 
 import SimpleStorageContract from "../contracts/SimpleStorage.json";
 import getWeb3 from "../getWeb3";
-import PostIt from "../components/PostIt.js"
+import PostIt from "../components/PostIt.js";
 
 import "../App.css";
 
+import data from "../data.js"
 
-var currentitems = []
-var items = [{
-          id:'1574752132567',
-          agree: 'y',
-          text: "兩國的文化已經漸行漸遠，實屬沒必要強迫兩國統一。",
-          age: 22,
-          name: "石牌小雞雞",
-          color: "yellow",
-          respond:{
-            "positive":3,
-            "negative":6
-          }
-        },
-        {
-          id:'1574752182674',
-          agree: 'y',
-          text: "我認為台灣擁有很多對岸沒有的，我實在不想被統一。",
-          age: 16,
-          name: '東區劉德華',
-          color: "green",
-          respond:{
-            "positive":17,
-            "negative":2
-          }
-        },
-        {
-          id:'1574752232922',
-          agree: 'f',
-          text: "區區灣灣人民，別忘了你們的老祖先，都是從中國而來，現在回歸祖國懷抱，豈能不答應?",
-          age: 53,
-          name: "韓家軍100號子弟兵",
-          color: "pink",
-          respond:{
-            "positive":10,
-            "negative":9
-          }
-        }]
-
+var items = []
+var question = []
 class CommentBoard extends Component {
    constructor (props) {
     super(props);
+    items = data.items[this.props.id]
+    question = data.questions[this.props.id]
     this.state = { 
       storageValue: 0, 
       web3: null, 
       accounts: null, 
       contract: null,
-      items: [],
+      currentitems: items,
       textarea: "",
       agree: null,
       user: {
@@ -68,10 +35,10 @@ class CommentBoard extends Component {
   }
 
   componentDidMount = async () => {
+    console.log("ij")
     try {
       // Get network provider and web3 instance.
       const web3 = await getWeb3();
-
       // Use web3 to get the user's accounts.
       const accounts = await web3.eth.getAccounts();
 
@@ -85,7 +52,7 @@ class CommentBoard extends Component {
 
       // Set web3, accounts, and contract to the state, and then proceed with an
       // example of interacting with the contract's methods.
-      this.setState({ web3, accounts, contract: instance, items:items});
+      this.setState({ web3, accounts, contract: instance, currentitems:items});
     } catch (error) {
       // Catch any errors for any of the above operations.
       alert(
@@ -109,22 +76,25 @@ class CommentBoard extends Component {
   };
 
   handleSelectOnchange = (e)=>{
-    console.log(e.target.value)
+    var temparray = []
     if(e.target.value === 'support')
-      currentitems = items.filter((item)=>{
+      temparray = items.filter((item)=>{
         return item.agree === 'y';       // 取得大於五歲的
       });
     else if(e.target.value === 'oppose')
-      currentitems = items.filter((item)=>{
+      temparray = items.filter((item)=>{
         return item.agree === 'f';       // 取得大於五歲的
       });
     else if(e.target.value === 'all')
-      currentitems = items
+      temparray = items
+    else if(e.target.value === 'time'){
+      temparray = items.sort((a, b) => (a.id) - (b.id));
+    }
     else if(e.target.value === 'likes'){
-      currentitems = items.sort((a, b) => (b.respond.positive) - (a.respond.positive));
+      temparray = items.sort((a, b) => (b.respond.positive) - (a.respond.positive));
     }
     this.setState({
-      items:currentitems
+      currentitems:temparray
     })
   }
 
@@ -135,7 +105,6 @@ class CommentBoard extends Component {
   }
 
   handleRadio = (e) =>{
-    console.log(e.target.value)
     this.setState({
       agree: e.target.value
     })
@@ -162,31 +131,9 @@ class CommentBoard extends Component {
       });
     
     this.setState({
-      items:items,
       agree:null,
       textarea:""
     });
-  }
-
-  changefilter = (flitername) =>{
-    if(flitername === 'agree')
-      currentitems = items.filter((item)=>{
-        return item.agree === 'y';       // 取得大於五歲的
-      });
-    else if(flitername === 'disagree')
-      currentitems = items.filter((item)=>{
-        return item.agree === 'f';       // 取得大於五歲的
-      });
-    else if(flitername === 'all')
-      currentitems = items
-    else if(flitername === 'likes'){
-      console.log('w')
-      currentitems = items.sort((a, b) => (b.respond.positive) - (a.respond.positive));
-    }
-
-    this.setState({
-      items:currentitems
-    })
   }
 
   handleCommentRespond = (id,respond) => {
@@ -236,17 +183,16 @@ class CommentBoard extends Component {
 
     this.setState({
       user:user,
-      items:items
+      currentitems:items
     });   
   }
 
   render() {
-    const { items,user } = this.state;
-    const postIts = items.map((item,index) =>{
+    const { currentitems,user } = this.state;
+    const postIts = currentitems.map((item,index) =>{
       const i = user.history.findIndex(userhistory => userhistory.id === item.id);
       var myRespond = null
       if(i>=0) myRespond = user.history[i].respond
-
         return(
           <PostIt item={item} handleCommentRespond={(i,respond) => this.handleCommentRespond(i,respond)} respond={myRespond}/>
         )
@@ -256,7 +202,7 @@ class CommentBoard extends Component {
       <div className='container bg-light pb-5 pt-4'>
         <div> 
           <h6>每日一問:</h6>       
-          <h1>你支持一國兩制嗎?</h1>
+          <h1>{question.question}?</h1>
           <hr/>   
           <div className="input-group mb-3 col-4">
             <div className="input-group-prepend">
