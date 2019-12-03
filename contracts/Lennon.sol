@@ -29,7 +29,7 @@ contract Lennon {
 
     function createAccount(string memory _name, uint8 _d, uint8 _m, uint16 _y) public {
         require(keccak256(abi.encodePacked(_name)) != keccak256(abi.encodePacked("")), "Name cannot be empty");
-        require(Accounts[owner_to_id[msg.sender]].birth_day == 0, "Cannot create more than one account");
+        require(Accounts[owner_to_id[msg.sender]].birth_day != 0, "Cannot create more than one account");
         uint id = Accounts.push(Account(_name, _d, _m, _y)) - 1;
         owner_to_id[msg.sender] = id;
         emit newAccount(id, _name, _d, _m, _y);
