@@ -24,8 +24,8 @@ contract Lennon {
 
     Post[] public Posts;
 
-    // a post need >= lace_threshold of likes to be decorated with lace
-    uint8 lace_threshold = 10;
+
+    uint8 lace_threshold = 10;    // a post need >= lace_threshold of likes to be decorated with lace
 
     constructor() public {
         Accounts.push(Account("", 0, 0, 0));
