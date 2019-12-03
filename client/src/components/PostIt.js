@@ -6,6 +6,7 @@ import ThumbUpIcon from '@material-ui/icons/ThumbUp';
 import ThumbDownIcon from '@material-ui/icons/ThumbDown';
 
 import "../css/postit.css"
+import "../css/borders.css"
 
 class PostIt extends Component {
 
@@ -13,10 +14,10 @@ class PostIt extends Component {
     this.props.handleCommentRespond(id,respond)
   }
 
-  render() {    
+  render() {   
     return (
-      <div className="col-xl-3 col-lg-4 col-md-6 col-sm-6 my-3">
-        <div className={"note " + (this.props.item.color)}>
+      <div className="col-xl-3 col-lg-4 col-md-6 col-sm-6 my-3 ">
+        <div className={"note " + (this.props.item.color) + " "+ (this.props.item.border) }>
           <div className="text-left">
             <h4>{(this.props.item.agree === 'y' ? '支持' : '反對')}</h4>
             <div>{  this.props.item.text}</div>

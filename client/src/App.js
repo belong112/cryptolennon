@@ -7,6 +7,7 @@ import Header from "./components/Header.js"
 import Footer from "./components/Footer.js"
 import CommentBoard from "./container/CommentBoard.js"
 import Homepage from "./container/Homepage.js"
+import Userpage from "./container/UserPage.js"
 
 import "./App.css";
 
@@ -17,7 +18,14 @@ class App extends Component {
       storageValue: 0, 
       web3: null, 
       accounts: null, 
-      contract: null,    
+      contract: null,
+      user: {
+        name:"鄭伊人",
+        age: 22,
+        history:[ // record user's respond to each comment
+          {id:'1574752132567',respond:'positive'},
+        ]
+      },    
     };
   }
   componentDidMount = async () => {
@@ -65,14 +73,16 @@ class App extends Component {
     if (!this.state.web3) {
       return <div>Loading Web3, accounts, and contract...!!!!!!!</div>;
     }
-    const CommentPage = (props) => { return ( <CommentBoard  />)};
+    const CommentPage = (props) => { return ( <CommentBoard id={props.match.params.boardid} />)};
+    const UserPage = (props) =>{ return ( <Userpage user={this.state.user}/>)};
     return (
       <BrowserRouter> 
         <div className='App'>
-          <Header/>
+          <Header user={this.state.user}/>
           <div>
             <Route exact path='/' component={Homepage} />
-            <Route exact path='/commentboard/' render={CommentPage} /> 
+            <Route exact path='/user' render={UserPage} />
+            <Route exact path='/commentboard/:boardid' render={CommentPage} /> 
           </div>
           <Footer/>
         </div>
