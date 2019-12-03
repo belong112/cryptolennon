@@ -41,6 +41,7 @@ contract Lennon {
 
     function createPost(string memory _post) public {
         uint owner_id = owner_to_id[msg.sender];
+        require(owner_id != 0, "Must create an account first");
         uint id = Posts.push(Post(_post, 0, owner_id, new uint[](0))) - 1;
         emit newPost(id, owner_id, _post);
     }
