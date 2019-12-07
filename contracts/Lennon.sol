@@ -1,9 +1,12 @@
 pragma solidity >=0.5.0;
 
-contract Lennon {
+import "./Ownable.sol";
+
+contract Lennon is Ownable {
 
     event newAccount(uint id, string name, uint birth_day, uint birth_month, uint birth_year);
-    event newPost(uint post_id, uint owner_id, string post);
+    event newReply(uint8 question_id, string reply, bool endorse, uint time, uint owner_id);
+    event liked(uint question_id, uint reply_id);
 
     struct Account {
         string name;
@@ -12,59 +15,99 @@ contract Lennon {
         uint16 birth_year;
     }
 
-    struct Post{
-        string post;
-        uint8 lace_type;
+    struct Reply {
+        string reply;
+        bool endorse;
+        uint time;
         uint owner_id;
         uint[] likes;
+    }
+
+    struct Question {
+        string question;
+        Reply[] replies;
     }
 
     Account[] public Accounts;
     mapping (address => uint) owner_to_id;
 
-    Post[] public Posts;
-
-    // a post need >= lace_threshold of likes to be decorated with lace
-    uint8 lace_threshold = 10;
+    Question[] public Questions;
 
     constructor() public {
         Accounts.push(Account("", 0, 0, 0));
+        Questions.push(Question("你支持反送中嗎?", new Reply[](0)));
+        Questions.push(Question("你喜歡吃香菜嗎?", new Reply[](0)));
+        Questions.push(Question("2020。歸。投。韓下去?", new Reply[](0)));
     }
 
-    function createAccount(string memory _name, uint8 _d, uint8 _m, uint16 _y) public {
-        require(keccak256(abi.encodePacked(_name)) != keccak256(abi.encodePacked("")), "Name cannot be empty");
+    // only owner of the contract can create a question
+    function create_question(string calldata _q) external onlyOwner {
+        Questions.push(Question(_q, new Reply[](0)));
+    }
+
+    // create an account given name and birthday
+    function create_account(string memory _name, uint8 _d, uint8 _m, uint16 _y) public {
         require(owner_to_id[msg.sender] == 0, "Cannot create more than one account");
         uint id = Accounts.push(Account(_name, _d, _m, _y)) - 1;
         owner_to_id[msg.sender] = id;
         emit newAccount(id, _name, _d, _m, _y);
     }
 
-    function createPost(string memory _post) public {
+    // create a reply of a question
+    function create_reply(uint8 _q_id, string memory _reply, bool _endorse, uint _time) public {
         uint owner_id = owner_to_id[msg.sender];
         require(owner_id != 0, "Must create an account first");
-        uint id = Posts.push(Post(_post, 0, owner_id, new uint[](0))) - 1;
-        emit newPost(id, owner_id, _post);
+        Questions[_q_id].replies.push(Reply(_reply, _endorse, _time, owner_id, new uint[](0)));
+        emit newReply(_q_id, _reply, _endorse, _time, owner_id);
     }
 
-    function like(uint16 _post_id) public {
-        bool like_already = false;
-        for(uint i = 0; i < Posts[_post_id].likes.length; i++) {
-            if(Posts[_post_id].likes[i] == owner_to_id[msg.sender]) {
-                like_already = true;
+    // like a reply
+    function like(uint8 _q_idx, uint8 _r_idx) public {
+        bool b = false;
+        for(uint i = 0; i < Questions[_q_idx].replies[_r_idx].likes.length; i++) {
+            if(Questions[_q_idx].replies[_r_idx].likes[i] == owner_to_id[msg.sender]) {
+                b = true;
                 break;
             }
         }
-        require(!like_already, "Can only like once");
-        Posts[_post_id].likes.push(owner_to_id[msg.sender]);
+        require(!b, "Already liked");
+        Questions[_q_idx].replies[_r_idx].likes.push(owner_to_id[msg.sender]);
+        emit liked(_q_idx, _r_idx);
     }
 
-    function get_num_likes(uint _post_id) external view returns(uint) {
-        return Posts[_post_id].likes.length;
+    // get total number of questions
+    function get_Question_length() external view returns(uint) {
+        return Questions.length;
     }
 
-    function set_lace(uint _post_id, uint8 _lace_type) public {
-        require(Posts[_post_id].owner_id == owner_to_id[msg.sender], "Can only set lace to own post");
-        require(Posts[_post_id].likes.length >= lace_threshold, "Not enough likes to decorate with lace");
-        Posts[_post_id].lace_type = _lace_type;
+    // get question and last update time given questionIdx
+    function get_Question(uint8 _q_idx) external view returns(string memory, uint) {
+        return (Questions[_q_idx].question, Questions[_q_idx].replies[Questions[_q_idx].replies.length - 1].time);
+    }
+
+    // get total number of reply to a question
+    function get_reply_length(uint8 _q_idx) external view returns(uint) {
+        return Questions[_q_idx].replies.length;
+    }
+
+    // get reply ,endorse ,time ,owner_id and #likes given questionIdx and ReplyIdx
+    function get_reply(uint8 _q_idx, uint8 _r_idx ) external view returns(string memory, bool, uint, uint, uint) {
+        Reply memory r = Questions[_q_idx].replies[_r_idx];
+        return (r.reply, r.endorse, r.time, r.owner_id, r.likes.length);
+    }
+
+    // get all replies of an account iteratively
+    /*
+        Usage:  For the first time call get_all_replies(-1,-1) and get (questionIdx, replyIdx), the first reply.
+                Then call get_all_replies(questionIdx, replyIdx) to get next replies iteratively until (-1, -1) returned.
+    */
+    function get_all_replies(int16 _q_id, int16 _r_id) external view returns(int16, int16) {
+        require(owner_to_id[msg.sender] != 0, "Must create an account first");
+        for(uint16 i = uint16(_q_id + 1); i < Questions.length; i++){
+            for(uint16 j = uint16(_r_id + 1); j < Questions[i].replies.length; j++){
+                if(Questions[i].replies[j].owner_id == owner_to_id[msg.sender]) return (int16(i), int16(j));
+            }
+        }
+        return (-1, -1);
     }
 }
