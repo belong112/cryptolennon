@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {NavLink} from "react-router-dom";
+import {NavLink, Link} from "react-router-dom";
 
 class Header extends Component {
   render() {
@@ -18,11 +18,11 @@ class Header extends Component {
                 <i className="fas fa-user pr-4"></i>
               </span>              
             </NavLink>
-            <NavLink to="/">
+            <Link to="/">
               <span style={{color:'white'}}>
                 <i className="fas fa-home"></i>
               </span>              
-            </NavLink>
+            </Link>
           </div>
         </div>
       </header>
