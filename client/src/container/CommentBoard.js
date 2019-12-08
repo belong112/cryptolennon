@@ -209,8 +209,6 @@ class CommentBoard extends Component {
             </div>
             <select className="custom-select" id='inputGroupSelect01' onChange={this.handleSelectOnchange}>
               <option value='all' selected>全部</option>
-              <option value="support">支持方</option>
-              <option value="oppose">反對方</option>
               <option value="time">照時間</option>
               <option value='likes'>照讚數</option>
             </select>
