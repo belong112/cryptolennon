@@ -5,7 +5,7 @@ import "./Ownable.sol";
 contract Lennon is Ownable {
 
     event newAccount(uint id, string name, uint birth_day, uint birth_month, uint birth_year);
-    event newReply(uint8 question_id, string reply, bool endorse, uint time, uint owner_id);
+    event newReply(uint question_id, uint reply_id, string reply, bool endorse, uint time, uint owner_id);
     event liked(uint question_id, uint reply_id);
 
     struct Account {
@@ -25,24 +25,25 @@ contract Lennon is Ownable {
 
     struct Question {
         string question;
-        Reply[] replies;
+        uint[] replies;
     }
 
     Account[] public Accounts;
     mapping (address => uint) owner_to_id;
 
     Question[] public Questions;
+    Reply[] public Replies;
 
     constructor() public {
         Accounts.push(Account("", 0, 0, 0));
-        Questions.push(Question("你支持反送中嗎?", new Reply[](0)));
-        Questions.push(Question("你喜歡吃香菜嗎?", new Reply[](0)));
-        Questions.push(Question("2020。歸。投。韓下去?", new Reply[](0)));
+        Questions.push(Question("你支持反送中嗎?", new uint[](0)));
+        Questions.push(Question("你喜歡吃香菜嗎?", new uint[](0)));
+        Questions.push(Question("2020。歸。投。韓下去?", new uint[](0)));
     }
 
     // only owner of the contract can create a question
     function create_question(string calldata _q) external onlyOwner {
-        Questions.push(Question(_q, new Reply[](0)));
+        Questions.push(Question(_q, new uint[](0)));
     }
 
     // create an account given name and birthday
@@ -57,22 +58,24 @@ contract Lennon is Ownable {
     function create_reply(uint8 _q_id, string memory _reply, bool _endorse, uint _time) public {
         uint owner_id = owner_to_id[msg.sender];
         require(owner_id != 0, "Must create an account first");
-        Questions[_q_id].replies.push(Reply(_reply, _endorse, _time, owner_id, new uint[](0)));
-        emit newReply(_q_id, _reply, _endorse, _time, owner_id);
+        uint r_id = Replies.push(Reply(_reply, _endorse, _time, owner_id, new uint[](0))) - 1;
+        Questions[_q_id].replies.push(r_id);
+        emit newReply(_q_id, r_id, _reply, _endorse, _time, owner_id);
     }
 
     // like a reply
-    function like(uint8 _q_idx, uint8 _r_idx) public {
+    function like(uint8 _q_id, uint8 _r_id) public {
         bool b = false;
-        for(uint i = 0; i < Questions[_q_idx].replies[_r_idx].likes.length; i++) {
-            if(Questions[_q_idx].replies[_r_idx].likes[i] == owner_to_id[msg.sender]) {
+        Reply storage r = Replies[Questions[_q_id].replies[_r_id]];
+        for(uint i = 0; i < r.likes.length; i++) {
+            if(r.likes[i] == owner_to_id[msg.sender]) {
                 b = true;
                 break;
             }
         }
         require(!b, "Already liked");
-        Questions[_q_idx].replies[_r_idx].likes.push(owner_to_id[msg.sender]);
-        emit liked(_q_idx, _r_idx);
+        r.likes.push(owner_to_id[msg.sender]);
+        emit liked(_q_id, _r_id);
     }
 
     // get total number of questions
@@ -81,18 +84,18 @@ contract Lennon is Ownable {
     }
 
     // get question and last update time given questionIdx
-    function get_Question(uint8 _q_idx) external view returns(string memory, uint) {
-        return (Questions[_q_idx].question, Questions[_q_idx].replies[Questions[_q_idx].replies.length - 1].time);
+    function get_Question(uint8 _q_id) external view returns(string memory, uint) {
+        return (Questions[_q_id].question, Replies[Questions[_q_id].replies[Questions[_q_id].replies.length - 1]].time);
     }
 
-    // get total number of reply to a question
-    function get_reply_length(uint8 _q_idx) external view returns(uint) {
-        return Questions[_q_idx].replies.length;
+    // get total number of replies to a question
+    function get_reply_length(uint8 _q_id) external view returns(uint) {
+        return Questions[_q_id].replies.length;
     }
 
     // get reply ,endorse ,time ,owner_id and #likes given questionIdx and ReplyIdx
-    function get_reply(uint8 _q_idx, uint8 _r_idx ) external view returns(string memory, bool, uint, uint, uint) {
-        Reply memory r = Questions[_q_idx].replies[_r_idx];
+    function get_reply(uint8 _q_id, uint8 _r_id ) external view returns(string memory, bool, uint, uint, uint) {
+        Reply storage r = Replies[Questions[_q_id].replies[_r_id]];
         return (r.reply, r.endorse, r.time, r.owner_id, r.likes.length);
     }
 
@@ -105,7 +108,7 @@ contract Lennon is Ownable {
         require(owner_to_id[msg.sender] != 0, "Must create an account first");
         for(uint16 i = uint16(_q_id + 1); i < Questions.length; i++){
             for(uint16 j = uint16(_r_id + 1); j < Questions[i].replies.length; j++){
-                if(Questions[i].replies[j].owner_id == owner_to_id[msg.sender]) return (int16(i), int16(j));
+                if(Replies[Questions[i].replies[j]].owner_id == owner_to_id[msg.sender]) return (int16(i), int16(j));
             }
         }
         return (-1, -1);

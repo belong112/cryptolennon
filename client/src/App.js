@@ -61,8 +61,12 @@ class App extends Component {
   runExample = async () => {
     const { accounts, contract } = this.state;
     
-    await contract.methods.createAccount("禕仁",3,12,2019);
-    const result = await contract.methods.Accounts(1);
+    await contract.methods.create_account("禕仁",3,12,2019);
+    await contract.methods.create_account("2仁",3,12,2019);
+    await contract.methods.create_account("3仁",3,12,2019);
+    // const result = await contract.methods.Accounts(0).call();
+    console.log(contract)
+    console.log(result)
   };
 
 
