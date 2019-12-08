@@ -8,15 +8,14 @@ import "../App.css";
 
 import data from "../data.js"
 
-var items = []
-var question = []
+let items = []
+let question = []
 class CommentBoard extends Component {
    constructor (props) {
     super(props);
     items = data.items[this.props.id]
     question = data.questions[this.props.id]
     this.state = { 
-      storageValue: 0, 
       web3: null, 
       accounts: null, 
       contract: null,
@@ -35,7 +34,6 @@ class CommentBoard extends Component {
   }
 
   componentDidMount = async () => {
-    console.log("ij")
     try {
       // Get network provider and web3 instance.
       const web3 = await getWeb3();
@@ -52,7 +50,7 @@ class CommentBoard extends Component {
 
       // Set web3, accounts, and contract to the state, and then proceed with an
       // example of interacting with the contract's methods.
-      this.setState({ web3, accounts, contract: instance, currentitems:items});
+      this.setState({ web3, accounts, contract: instance});
     } catch (error) {
       // Catch any errors for any of the above operations.
       alert(
@@ -88,10 +86,10 @@ class CommentBoard extends Component {
     else if(e.target.value === 'all')
       temparray = items
     else if(e.target.value === 'time'){
-      temparray = items.sort((a, b) => (a.id) - (b.id));
+      temparray = items.concat().sort((a, b) => (a.id) - (b.id));
     }
     else if(e.target.value === 'likes'){
-      temparray = items.sort((a, b) => (b.respond.positive) - (a.respond.positive));
+      temparray = items.concat().sort((a, b) => (b.respond.positive) - (a.respond.positive));
     }
     this.setState({
       currentitems:temparray
@@ -123,7 +121,7 @@ class CommentBoard extends Component {
         text:textarea,
         name:user.name,
         age:user.age,
-        color: "blue",
+        color: agree === 'f' ? 'pink' : 'green',
         respond:{
             "positive":0,
             "negative":0
@@ -137,7 +135,7 @@ class CommentBoard extends Component {
   }
 
   handleCommentRespond = (id,respond) => {
-    const {items,user} = this.state;
+    const {user} = this.state;
     const index = user.history.findIndex(item => item.id === id);
     const item = user.history[index];
     const index2 = items.findIndex(item2 => item2.id === id);
@@ -202,7 +200,8 @@ class CommentBoard extends Component {
       <div className='container bg-light pb-5 pt-4'>
         <div> 
           <h6>每日一問:</h6>       
-          <h1>{question.question}?</h1>
+          <h1>{question.title}?</h1>
+          <h6>{question.subtitle}</h6>
           <hr/>   
           <div className="input-group mb-3 col-4">
             <div className="input-group-prepend">

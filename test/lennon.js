@@ -25,12 +25,23 @@ contract("Lennon", accounts => {
     assert.equal(result['name'], "禕仁", "The account is not created correctly.");
   });
 
+  it("...should say account already created", async () => {
+    let instance = await Lennon.deployed();
+    
+    // Create account
+    const accountCreated = await instance.getAccount();
+    
+    // await instance.createAccount("禕仁",3,12,2019,  { from: accounts[0] });
+
+    assert.equal(accountCreated, true, "The account is not created correctly.");
+  });
+
   it("...should create post", async () => {
     let instance = await Lennon.deployed();
     
     // Create post 
-    await instance.createPost("測試", { from: accounts[0] });
-    const result = await instance.Posts(0);
+    await instance.create_question("測試", { from: accounts[0] });
+    const result = await instance.PoQuestionssts(0);
     console.log(result)
 
     assert.equal(result['post'],  "測試", "The post is not created correctly.");
