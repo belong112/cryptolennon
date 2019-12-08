@@ -34,6 +34,11 @@ contract Lennon is Ownable {
     Question[] public Questions;
     Reply[] public Replies;
 
+    modifier needAccount() {
+        require(owner_to_id[msg.sender] != 0, "Must create an account first");
+        _;
+    }
+
     constructor() public {
         Accounts.push(Account("", 0, 0, 0));
         Questions.push(Question("你支持反送中嗎?", new uint[](0)));
@@ -55,16 +60,15 @@ contract Lennon is Ownable {
     }
 
     // create a reply of a question
-    function create_reply(uint8 _q_id, string memory _reply, bool _endorse, uint _time) public {
+    function create_reply(uint8 _q_id, string memory _reply, bool _endorse, uint _time) public needAccount {
         uint owner_id = owner_to_id[msg.sender];
-        require(owner_id != 0, "Must create an account first");
         uint r_id = Replies.push(Reply(_reply, _endorse, _time, owner_id, new uint[](0))) - 1;
         Questions[_q_id].replies.push(r_id);
         emit newReply(_q_id, r_id, _reply, _endorse, _time, owner_id);
     }
 
     // like a reply
-    function like(uint8 _q_id, uint8 _r_id) public {
+    function like(uint8 _q_id, uint8 _r_id) public needAccount {
         bool b = false;
         Reply storage r = Replies[Questions[_q_id].replies[_r_id]];
         for(uint i = 0; i < r.likes.length; i++) {
@@ -79,7 +83,7 @@ contract Lennon is Ownable {
     }
 
     // get name and birthday of the user
-    function get_account() external view returns(string memory, uint8, uint8, uint16) {
+    function get_account() external view needAccount returns(string memory, uint8, uint8, uint16) {
         Account storage a = Accounts[owner_to_id[msg.sender]];
         return (a.name, a.birth_day, a.birth_month, a.birth_year);
     }
@@ -89,31 +93,30 @@ contract Lennon is Ownable {
         return Questions.length;
     }
 
-    // get question and last update time given questionIdx
-    function get_Question(uint8 _q_id) external view returns(string memory, uint) {
+    // get question and last update time given questionId
+    function get_Question(uint _q_id) external view returns(string memory, uint) {
         return (Questions[_q_id].question, Replies[Questions[_q_id].replies[Questions[_q_id].replies.length - 1]].time);
     }
 
     // get total number of replies to a question
-    function get_reply_length(uint8 _q_id) external view returns(uint) {
+    function get_reply_length(uint _q_id) external view returns(uint) {
         return Questions[_q_id].replies.length;
     }
 
-    // get reply ,endorse ,time ,owner_id and #likes given questionIdx and ReplyIdx
-    function get_reply(uint8 _q_id, uint8 _r_id ) external view returns(string memory, bool, uint, uint, uint) {
-        Reply storage r = Replies[Questions[_q_id].replies[_r_id]];
+    // get reply, endorse, time, owner_id and #likes of _r_idx(th) reply to the question with id = _q_id
+    function get_reply(uint _q_id, uint _r_idx ) external view returns(string memory, bool, uint, uint, uint) {
+        Reply storage r = Replies[Questions[_q_id].replies[_r_idx]];
         return (r.reply, r.endorse, r.time, r.owner_id, r.likes.length);
     }
 
-    // get all replies of an account iteratively
+    // get all replies of an account iteratively (_r_idx(th) reply to the question with id = _q_id)
     /*
-        Usage:  For the first time call get_all_replies(-1,-1) and get (questionIdx, replyIdx), the first reply.
-                Then call get_all_replies(questionIdx, replyIdx) to get next replies iteratively until (-1, -1) returned.
+        Usage:  For the first time call get_all_replies(-1,-1) and get (x, y), the first reply.
+                Then call get_all_replies(x, y) to get the next reply iteratively until (-1, -1) returned.
     */
-    function get_all_replies(int16 _q_id, int16 _r_id) external view returns(int16, int16) {
-        require(owner_to_id[msg.sender] != 0, "Must create an account first");
+    function get_all_replies(uint _q_id, uint _r_idx) external view needAccount returns(int, int) {
         for(uint16 i = uint16(_q_id + 1); i < Questions.length; i++){
-            for(uint16 j = uint16(_r_id + 1); j < Questions[i].replies.length; j++){
+            for(uint16 j = uint16(_r_idx + 1); j < Questions[i].replies.length; j++){
                 if(Replies[Questions[i].replies[j]].owner_id == owner_to_id[msg.sender]) return (int16(i), int16(j));
             }
         }
