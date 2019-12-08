@@ -6,7 +6,7 @@ var items = [
     text: "兩國的文化已經漸行漸遠，實屬沒必要強迫兩國統一。",
     age: 22,
     name: "石牌小雞雞",
-    color: "yellow",
+    color: "green",
     border: "gradient",
     respond:{
       "positive":3,
@@ -67,18 +67,46 @@ var items = [
       "negative":28
     }
   },
+],
+[
+  {
+    id:'1574752232926',
+    agree: 'f',
+    text: "不要，好髒",
+    age: 53,
+    name: "韓家軍100號子弟兵",
+    color: "pink",
+    border: "",
+    respond:{
+      "positive":1,
+      "negative":99
+    }
+  },
 ]
 ]
 
 var questions = [
   {
-    id: '144232323213',
-    question:"你支持一國兩制嗎"
+    id: '0',
+    genre: 'Politics',
+    title:"你支持香菜英文嗎",
+    subtitle: '此香菜非比香菜',
+    num_comments: 11
   },
   {
-    id: '145999292122',
-    question: '你吃香菜嗎'
-  }
+    id: '1',
+    genre: 'Life',
+    title: '你吃香菜嗎',
+    subtitle: '吃或不吃，這是個問題',
+    num_comments: 2
+  },
+  {
+    id: '2',
+    genre: 'Life',
+    title: '你吃布丁會舔包裝膜嗎',
+    subtitle: '吃就要吃乾淨啊',
+    num_comments: 0
+  },
 ]
 
 export default { items, questions };
