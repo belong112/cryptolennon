@@ -78,6 +78,12 @@ contract Lennon is Ownable {
         emit liked(_q_id, _r_id);
     }
 
+    // get name and birthday of the user
+    function get_account() external view returns(string memory, uint8, uint8, uint16) {
+        Account storage a = Accounts[owner_to_id[msg.sender]];
+        return (a.name, a.birth_day, a.birth_month, a.birth_year);
+    }
+
     // get total number of questions
     function get_Question_length() external view returns(uint) {
         return Questions.length;
