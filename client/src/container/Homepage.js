@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import {NavLink, Link} from "react-router-dom";
 
-import test1 from "../img/flag.jpg"
+import test1 from "../img/tsai.jpg"
 
 import data from "../data.js"
 
@@ -12,6 +12,9 @@ class Homepage extends Component {
    constructor (props) {
     super(props);
     this.state={
+      web3: this.props.web3,
+      contract: this.props.contract,
+      accounts: this.props.accounts,
       genre: "",
       textarea: "",
       subtitle: "",
@@ -64,7 +67,7 @@ class Homepage extends Component {
     var sectionStyle = {
       width: "100%",
       backgroundImage: `url(${test1})`,
-      backgroundPosition: "center 10%", 
+      backgroundPosition: "center 90%", 
       backgroundSize:"100%",
     };
 
@@ -102,9 +105,6 @@ class Homepage extends Component {
                 <div class="mb-1 text-muted">Nov 11</div>
                 <p class="mb-auto">{sortarray[2].subtitle}</p>
                 <NavLink to={"/commentboard/"+(sortarray[2].id)}>go to commentboard</NavLink>
-              </div>
-              <div class="col-auto d-none d-lg-block">
-                <svg class="bd-placeholder-img" width="200" height="250" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" focusable="false" role="img" aria-label="Placeholder: Thumbnail"><title>Placeholder</title><rect width="100%" height="100%" fill="#55595c"></rect><text x="50%" y="50%" fill="#eceeef" dy=".3em">Thumbnail</text></svg>
               </div>
             </div>
           </div>

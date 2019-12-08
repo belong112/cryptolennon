@@ -3,7 +3,6 @@ import React, { Component } from 'react';
 import Badge from '@material-ui/core/Badge';
 import IconButton from '@material-ui/core/IconButton';
 import ThumbUpIcon from '@material-ui/icons/ThumbUp';
-import ThumbDownIcon from '@material-ui/icons/ThumbDown';
 
 import "../css/postit.css"
 import "../css/borders.css"
@@ -29,12 +28,7 @@ class PostIt extends Component {
               <Badge badgeContent={this.props.item.respond.positive} color="primary">
                 <ThumbUpIcon color={(this.props.respond === 'positive' ? 'primary':'')} />
               </Badge>
-            </IconButton>
-            <IconButton onClick={()=>{this.handleCommentRespond(this.props.item.id,"negative")}} spacing={2}>
-              <Badge badgeContent={this.props.item.respond.negative} color="secondary">
-                <ThumbDownIcon color={(this.props.respond === 'negative' ? 'secondary':'')} />
-              </Badge>
-            </IconButton>
+            </IconButton>            
           </div>
         </div>
       </div>     

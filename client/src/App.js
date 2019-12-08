@@ -72,15 +72,15 @@ class App extends Component {
       return <div>Loading Web3, accounts, and contract...!!!!!!!</div>;
     }
     this.runExample();
-    // const Homepage = (props) => {return ( <Homepage contract={this.state.contract}/>)};
-    const UserPage = (props) =>{ return ( <Userpage user={this.state.user}/>)};
-    const CommentPage = (props) => { return ( <CommentBoard id={props.match.params.boardid} />)};
+    const CommentPage = (props) => { return ( <CommentBoard web3={this.state.web3} accounts={this.state.accounts} contract={this.state.contract} id={props.match.params.boardid} />)};
+    const UserPage = (props) =>{ return ( <Userpage user={this.state.user} />)};
+    const HomePage = (props) =>{ return ( <Homepage web3={this.state.web3} accounts={this.state.accounts} contract={this.state.contract} />)}
     return (
       <BrowserRouter> 
         <div className='App'>
           <Header user={this.state.user}/>
           <div>
-            <Route exact path='/' component={Homepage} />
+            <Route exact path='/' render={HomePage} />
             <Route exact path='/user' render={UserPage} />
             <Route exact path='/commentboard/:boardid' render={CommentPage} /> 
           </div>

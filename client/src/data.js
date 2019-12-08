@@ -105,7 +105,7 @@ var questions = [
     genre: 'Life',
     title: '你吃布丁會舔包裝膜嗎',
     subtitle: '吃就要吃乾淨啊',
-    num_comments: 8
+    num_comments: 0
   },
 ]
 
