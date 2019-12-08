@@ -115,9 +115,9 @@ contract Lennon is Ownable {
                 Then call get_all_replies(x, y) to get the next reply iteratively until (-1, -1) returned.
     */
     function get_all_replies(uint _q_id, uint _r_idx) external view needAccount returns(int, int) {
-        for(uint16 i = uint16(_q_id + 1); i < Questions.length; i++){
-            for(uint16 j = uint16(_r_idx + 1); j < Questions[i].replies.length; j++){
-                if(Replies[Questions[i].replies[j]].owner_id == owner_to_id[msg.sender]) return (int16(i), int16(j));
+        for(uint i = uint(_q_id + 1); i < Questions.length; i++){
+            for(uint j = uint(_r_idx + 1); j < Questions[i].replies.length; j++){
+                if(Replies[Questions[i].replies[j]].owner_id == owner_to_id[msg.sender]) return (int(i), int(j));
             }
         }
         return (-1, -1);
