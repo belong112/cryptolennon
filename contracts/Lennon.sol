@@ -67,10 +67,10 @@ contract Lennon is Ownable {
         emit newReply(_q_id, r_id, _reply, _endorse, _time, owner_id);
     }
 
-    // like a reply
-    function like(uint8 _q_id, uint8 _r_id) public needAccount {
+    // like a reply (_r_idx(th) reply of the question)
+    function like(uint8 _q_id, uint8 _r_idx) public needAccount {
         bool b = false;
-        Reply storage r = Replies[Questions[_q_id].replies[_r_id]];
+        Reply storage r = Replies[Questions[_q_id].replies[_r_idx]];
         for(uint i = 0; i < r.likes.length; i++) {
             if(r.likes[i] == owner_to_id[msg.sender]) {
                 b = true;
@@ -79,7 +79,7 @@ contract Lennon is Ownable {
         }
         require(!b, "Already liked");
         r.likes.push(owner_to_id[msg.sender]);
-        emit liked(_q_id, _r_id);
+        emit liked(_q_id, _r_idx);
     }
 
     // get name and birthday of the user
