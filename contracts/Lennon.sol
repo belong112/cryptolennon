@@ -88,6 +88,13 @@ contract Lennon is Ownable {
         return (a.name, a.birth_day, a.birth_month, a.birth_year);
     }
 
+    // get name and birthday of the user given id
+    function get_account(uint _id) external view returns(string memory, uint8, uint8, uint16) {
+        require(_id != 0, "id should not be 0");
+        Account storage a = Accounts[_id];
+        return (a.name, a.birth_day, a.birth_month, a.birth_year);
+    }
+
     // get total number of questions
     function get_question_length() external view returns(uint) {
         return Questions.length;
@@ -115,11 +122,14 @@ contract Lennon is Ownable {
         Usage:  For the first time call get_all_replies(-1,-1) and get (x, y), the first reply.
                 Then call get_all_replies(x, y) to get the next reply iteratively until (-1, -1) returned.
     */
-    function get_all_replies(uint _q_id, uint _r_idx) external view needAccount returns(int, int) {
-        for(uint i = uint(_q_id + 1); i < Questions.length; i++){
-            for(uint j = uint(_r_idx + 1); j < Questions[i].replies.length; j++){
+    function get_all_replies(int _q_id, int _r_idx) external view needAccount returns(int, int) {
+        uint i = uint(_q_id == -1? 0 : _q_id);
+        uint j = uint(_r_idx + 1);
+        for(; i < Questions.length; i++){
+            for(; j < Questions[i].replies.length; j++){
                 if(Replies[Questions[i].replies[j]].owner_id == owner_to_id[msg.sender]) return (int(i), int(j));
             }
+            j = 0;
         }
         return (-1, -1);
     }
