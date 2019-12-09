@@ -89,12 +89,13 @@ contract Lennon is Ownable {
     }
 
     // get total number of questions
-    function get_Question_length() external view returns(uint) {
+    function get_question_length() external view returns(uint) {
         return Questions.length;
     }
 
     // get question and last update time given questionId
-    function get_Question(uint _q_id) external view returns(string memory, uint) {
+    function get_question(uint _q_id) external view returns(string memory, uint) {
+        if( Questions[_q_id].replies.length == 0 ) return (Questions[_q_id].question, 0);
         return (Questions[_q_id].question, Replies[Questions[_q_id].replies[Questions[_q_id].replies.length - 1]].time);
     }
 
