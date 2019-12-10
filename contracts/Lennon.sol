@@ -51,7 +51,7 @@ contract Lennon is Ownable {
         Replies.push(Reply("我是鋼鐵韓粉，氣氣氣氣氣!", false, 2, 0, new uint[](0)));
         Questions[1].replies.push(2);
         Replies.push(Reply("習維尼尼瑪八七", true, 3, 0, new uint[](0)));
-        Questions[0].replies.push(0);
+        Questions[0].replies.push(3);
     }
 
     // only owner of the contract can create a question
