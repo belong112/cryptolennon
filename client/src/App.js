@@ -48,7 +48,7 @@ class App extends Component {
 
       // Set web3, accounts, and contract to the state, and then proceed with an
       // example of interacting with the contract's methods.
-      this.setState({ web3, accounts, contract: instance});
+      this.setState({ web3, accounts, contract: instance}, this.runExample);
     } catch (error) {
       // Catch any errors for any of the above operations.
       alert(
@@ -60,10 +60,28 @@ class App extends Component {
 
   runExample = async () => {
     const { accounts, contract } = this.state;
+
+    // success
+    // const t1 = await contract.methods.get_question(0).call();
+    // console.log(t1); 
+
+    // success
+    // await contract.methods.create_question('幹你娘?').send({from: accounts[0]});
+    // const t2 = await contract.methods.get_question(3).call();
+    // console.log(t2);
+
+    // failed
+    // const t3 = await contract.methods.get_account().call();
+    // console.log(t3);
+
+    //fail
+    // const t4 = await contract.methods.get_reply(0, 0).call({from: accounts[0]});
+    // console.log(t4);
+
+
+
     
-    await contract.methods.create_account("禕仁",3,12,2019);
-    const result = await contract.methods.get_account();
-  };
+  }
 
 
 
@@ -71,7 +89,6 @@ class App extends Component {
     if (!this.state.web3) {
       return <div>Loading Web3, accounts, and contract...!!!!!!!</div>;
     }
-    this.runExample();
     const CommentPage = (props) => { return ( <CommentBoard web3={this.state.web3} accounts={this.state.accounts} contract={this.state.contract} id={props.match.params.boardid} />)};
     const UserPage = (props) =>{ return ( <Userpage user={this.state.user} />)};
     const HomePage = (props) =>{ return ( <Homepage web3={this.state.web3} accounts={this.state.accounts} contract={this.state.contract} />)}

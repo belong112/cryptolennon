@@ -73,37 +73,37 @@ class Homepage extends Component {
 
     return (
       <div className='container'>
-        <div class="nav-scroller py-1 mb-2 bg-white">
+        <div className="nav-scroller py-1 mb-2 bg-white">
           
         </div>
         <div className='bg-light pb-5 px-2'>
-        	<div class="jumbotron p-4 p-md-5 text-white rounded bg-dark" style={sectionStyle}>
-            <div class="col-md-6 px-0 text-left">
-              <p class="lead my-3">發燒話題</p>
+        	<div className="jumbotron p-4 p-md-5 text-white rounded bg-dark" style={sectionStyle}>
+            <div className="col-md-6 px-0 text-left">
+              <p className="lead my-3">發燒話題</p>
               <h4 className='text-danger'>{sortarray[0].genre}</h4>
-              <h1 class="display-4 ">{sortarray[0].title}</h1>         
-              <p class="lead mb-0"><NavLink className="text-white font-weight-bold" to={"/commentboard/"+(sortarray[0].id)}>進入討論區</NavLink></p>
+              <h1 className="display-4 ">{sortarray[0].title}</h1>         
+              <p className="lead mb-0"><NavLink className="text-white font-weight-bold" to={"/commentboard/"+(sortarray[0].id)}>進入討論區</NavLink></p>
             </div>
           </div>
-          <div class="row mb-2">
-          <div class="col-md-6">
-            <div class="row no-gutters border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
-              <div class="col p-4 d-flex flex-column position-static">
-                <strong class="d-inline-block mb-2 text-primary">{sortarray[1].genre}</strong>
-                <h3 class="mb-0">{sortarray[1].title}</h3>
-                <div class="mb-1 text-muted">Nov 12</div>
-                <p class="card-text mb-auto">{sortarray[1].subtitle}</p>
+          <div className="row mb-2">
+          <div className="col-md-6">
+            <div className="row no-gutters border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
+              <div className="col p-4 d-flex flex-column position-static">
+                <strong className="d-inline-block mb-2 text-primary">{sortarray[1].genre}</strong>
+                <h3 className="mb-0">{sortarray[1].title}</h3>
+                <div className="mb-1 text-muted">Nov 12</div>
+                <p className="card-text mb-auto">{sortarray[1].subtitle}</p>
                 <Link to={"/commentboard/"+(sortarray[1].id)}>go to commentboard</Link>
               </div>
             </div>
           </div>
-          <div class="col-md-6">
-            <div class="row no-gutters border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
-              <div class="col p-4 d-flex flex-column position-static">
-                <strong class="d-inline-block mb-2 text-success">{sortarray[2].genre}</strong>
-                <h3 class="mb-0">{sortarray[2].title}</h3>
-                <div class="mb-1 text-muted">Nov 11</div>
-                <p class="mb-auto">{sortarray[2].subtitle}</p>
+          <div className="col-md-6">
+            <div className="row no-gutters border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
+              <div className="col p-4 d-flex flex-column position-static">
+                <strong className="d-inline-block mb-2 text-success">{sortarray[2].genre}</strong>
+                <h3 className="mb-0">{sortarray[2].title}</h3>
+                <div className="mb-1 text-muted">Nov 11</div>
+                <p className="mb-auto">{sortarray[2].subtitle}</p>
                 <NavLink to={"/commentboard/"+(sortarray[2].id)}>go to commentboard</NavLink>
               </div>
             </div>
@@ -120,19 +120,19 @@ class Homepage extends Component {
         <hr/>
         <div className='mt-5'>
           <h3>我要提問</h3>
-          <div class="form-group">
+          <div className="form-group">
             <label for="Select1">選擇主題</label>
-            <select class="form-control" id="Select1" onChange={this.handleSelecctOnchange}>
+            <select className="form-control" id="Select1" onChange={this.handleSelecctOnchange}>
               <option>-</option>
               <option value='Life'>Life</option>
               <option value='Politics'>Politics</option>
             </select>
           </div>
-          <div class="form-group">
+          <div className="form-group">
             <label>問題</label>
             <input type="text" className="form-control" onChange={this.handleTxtOnchange} value={this.state.textarea} />
           </div>
-          <div class="form-group">
+          <div className="form-group">
             <label>副標題</label>
             <input type="text" className="form-control"  onChange={this.handleSubOnchange} value={this.state.subtitle} />
           </div>  
