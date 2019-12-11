@@ -13,7 +13,8 @@ class CommentBoard extends Component {
       web3: this.props.web3,
       accounts: this.props.accounts,
       contract: this.props.contract,
-      comments: [],
+      comments: [],  // 真實資料
+      currentarray: [],  // filter後的
       question: "",
       textarea: "",
       agree: null,
@@ -59,7 +60,8 @@ class CommentBoard extends Component {
 
       this.setState({
         question: question,
-        comments: temparray
+        comments: temparray,
+        currentarray: temparray
       })
 
     } catch (error) {
@@ -68,25 +70,16 @@ class CommentBoard extends Component {
   };
 
   handleSelectOnchange = (e)=>{
+    const {comments} = this.state
     var temparray = []
-    if(e.target.value === 'support')
-      temparray = items.filter((item)=>{
-        return item.agree === 'y';       // 取得大於五歲的
-      });
-    else if(e.target.value === 'oppose')
-      temparray = items.filter((item)=>{
-        return item.agree === 'f';       // 取得大於五歲的
-      });
-    else if(e.target.value === 'all')
-      temparray = items
-    else if(e.target.value === 'time'){
-      temparray = items.concat().sort((a, b) => (a.id) - (b.id));
+    if(e.target.value === 'time'){
+      temparray = comments.concat().sort((a, b) => (a.id) - (b.id));
     }
     else if(e.target.value === 'likes'){
-      temparray = items.concat().sort((a, b) => (b.respond.positive) - (a.respond.positive));
+      temparray = comments.concat().sort((a, b) => (b.respond.positive) - (a.respond.positive));
     }
     this.setState({
-      comments:temparray
+      currentarray:temparray
     })
   }
 
@@ -111,8 +104,8 @@ class CommentBoard extends Component {
     else  
       items.unshift({
         id: 15000 + (Math.random() * (1000)),
-        agree:agree,
-        text:textarea,
+        comment:textarea,
+        endorse:agree,
         name:user.name,
         age:user.age,
         color: agree === 'f' ? 'pink' : 'green',
@@ -123,7 +116,7 @@ class CommentBoard extends Component {
       });
     
     this.setState({
-      agree:null,
+      agree: null,
       textarea:""
     });
   }
@@ -180,8 +173,8 @@ class CommentBoard extends Component {
   }
 
   render() {
-    const { comments,user,question,contract } = this.state;
-    const postIts = comments.map((item,index) =>{
+    const { currentarray,user,question,contract } = this.state;
+    const postIts = currentarray.map((item,index) =>{
       // const i = user.history.findIndex(userhistory => userhistory.id === item.id);
       // var myRespond = null
       // if(i>=0) myRespond = user.history[i].respond
