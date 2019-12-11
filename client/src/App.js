@@ -61,22 +61,22 @@ class App extends Component {
   runExample = async () => {
     const { accounts, contract } = this.state;
 
-    // success
     // const t1 = await contract.methods.get_question(0).call();
-    // console.log(t1); 
 
-    // success
     // await contract.methods.create_question('幹你娘?').send({from: accounts[0]});
     // const t2 = await contract.methods.get_question(3).call();
     // console.log(t2);
 
-    // failed
-    // const t3 = await contract.methods.get_account().call();
-    // console.log(t3);
+    // await contract.methods.create_account('bitch', 1, 2, 1998).send({from: accounts[0]});
+    try {
+      const result = await contract.methods.get_account().call({from:accounts[2000]})
+    } 
+    catch (err){
+      console.log("error")
+      console.log(err);
+    }
 
-    //fail
-    // const t4 = await contract.methods.get_reply(0, 0).call({from: accounts[0]});
-    // console.log(t4);
+    const t4 = await contract.methods.get_reply(0, 0).call();
 
 
 

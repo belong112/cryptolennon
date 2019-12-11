@@ -92,14 +92,14 @@ contract Lennon is Ownable {
 
     // get name and birthday of the user
     function get_account() external view needAccount returns(string memory, uint8, uint8, uint16) {
-        Account storage a = Accounts[owner_to_id[msg.sender]];
+        Account memory a = Accounts[owner_to_id[msg.sender]];
         return (a.name, a.birth_day, a.birth_month, a.birth_year);
     }
 
     // get name and birthday of the user given id
     function get_account(uint _id) external view returns(string memory, uint8, uint8, uint16) {
         require(_id != 0, "id should not be 0");
-        Account storage a = Accounts[_id];
+        Account memory a = Accounts[_id];
         return (a.name, a.birth_day, a.birth_month, a.birth_year);
     }
 
@@ -121,7 +121,7 @@ contract Lennon is Ownable {
 
     // get reply, endorse, time, owner_id and #likes of _r_idx(th) reply to the question with id = _q_id
     function get_reply(uint _q_id, uint _r_idx ) external view returns(string memory, bool, uint, uint, uint) {
-        Reply storage r = Replies[Questions[_q_id].replies[_r_idx]];
+        Reply memory r = Replies[Questions[_q_id].replies[_r_idx]];
         return (r.reply, r.endorse, r.time, r.owner_id, r.likes.length);
     }
 
