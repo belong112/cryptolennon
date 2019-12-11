@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import {Route, BrowserRouter} from "react-router-dom"
 
-import SimpleStorageContract from "./contracts/SimpleStorage.json";
 import LennonContract from "./contracts/Lennon.json";
 
 import getWeb3 from "./getWeb3";
@@ -59,7 +58,7 @@ class App extends Component {
   };
 
   runExample = async () => {
-    const { accounts, contract } = this.state;
+    //const { accounts, contract } = this.state;
 
     // success
     // const t1 = await contract.methods.get_question(0).call();
@@ -77,13 +76,8 @@ class App extends Component {
     //fail
     // const t4 = await contract.methods.get_reply(0, 0).call({from: accounts[0]});
     // console.log(t4);
-
-
-
-    
+ 
   }
-
-
 
   render() {
     if (!this.state.web3) {
