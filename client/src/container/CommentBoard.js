@@ -1,25 +1,20 @@
 import React, { Component } from "react";
 
-import SimpleStorageContract from "../contracts/SimpleStorage.json";
-import getWeb3 from "../getWeb3";
 import PostIt from "../components/PostIt.js";
 
 import "../App.css";
 
-import data from "../data.js"
 
 let items = []
-let question = []
 class CommentBoard extends Component {
    constructor (props) {
     super(props);
-    items = data.items[this.props.id]
-    question = data.questions[this.props.id]
     this.state = { 
-      web3: null, 
-      accounts: null, 
-      contract: null,
-      currentitems: items,
+      web3: this.props.web3,
+      accounts: this.props.accounts,
+      contract: this.props.contract,
+      comments: [],
+      question: "",
       textarea: "",
       agree: null,
       user: {
@@ -34,43 +29,42 @@ class CommentBoard extends Component {
   }
 
   componentDidMount = async () => {
+    const {contract,accounts} = this.state
+    const q_id = this.props.id
     try {
-      // Get network provider and web3 instance.
-      const web3 = await getWeb3();
-      // Use web3 to get the user's accounts.
-      const accounts = await web3.eth.getAccounts();
+      // get question
+      var temp = await contract.methods.get_question(q_id).call()
+      const question = {
+        genre: 'Life',
+        title: temp[0].toString(),
+        subtitle: 'N/A'
+      }
 
-      // Get the contract instance.
-      const networkId = await web3.eth.net.getId();
-      const deployedNetwork = SimpleStorageContract.networks[networkId];
-      const instance = new web3.eth.Contract(
-        SimpleStorageContract.abi,
-        deployedNetwork && deployedNetwork.address,
-      );
+      // get reply
+      var l = await contract.methods.get_reply_length(q_id).call()
 
-      // Set web3, accounts, and contract to the state, and then proceed with an
-      // example of interacting with the contract's methods.
-      this.setState({ web3, accounts, contract: instance});
+      var temparray= []
+      for (var i = 0; i < l; i++) {
+        temp = await contract.methods.get_reply(q_id, i).call({from: accounts[0]})
+        const newitem = {
+          id: i.toString(),
+          comment: temp[0].toString(),
+          endorse: temp[1],
+          time: temp[2],
+          owner_id: temp[3],
+          num_likes: temp[4],
+        }
+        temparray.push(newitem)
+      }
+
+      this.setState({
+        question: question,
+        comments: temparray
+      })
+
     } catch (error) {
-      // Catch any errors for any of the above operations.
-      alert(
-        `Failed to load web3, accounts, or contract. Check console for details.`,
-      );
-      console.error(error);
+      alert( error );
     }
-  };
-
-  runExample = async () => {
-    const { accounts, contract } = this.state;
-
-    // Stores a given value, 5 by default.
-    await contract.methods.set(1000).send({ from: accounts[0] });
-
-    // Get the value from the contract to prove it worked.
-    const response = await contract.methods.get().call();
-
-    // Update state with the result.
-    this.setState({ storageValue: response });
   };
 
   handleSelectOnchange = (e)=>{
@@ -92,7 +86,7 @@ class CommentBoard extends Component {
       temparray = items.concat().sort((a, b) => (b.respond.positive) - (a.respond.positive));
     }
     this.setState({
-      currentitems:temparray
+      comments:temparray
     })
   }
 
@@ -181,18 +175,18 @@ class CommentBoard extends Component {
 
     this.setState({
       user:user,
-      currentitems:items
+      comments:items
     });   
   }
 
   render() {
-    const { currentitems,user } = this.state;
-    const postIts = currentitems.map((item,index) =>{
-      const i = user.history.findIndex(userhistory => userhistory.id === item.id);
-      var myRespond = null
-      if(i>=0) myRespond = user.history[i].respond
+    const { comments,user,question,contract } = this.state;
+    const postIts = comments.map((item,index) =>{
+      // const i = user.history.findIndex(userhistory => userhistory.id === item.id);
+      // var myRespond = null
+      // if(i>=0) myRespond = user.history[i].respond
         return(
-          <PostIt item={item} handleCommentRespond={(i,respond) => this.handleCommentRespond(i,respond)} respond={myRespond}/>
+          <PostIt contract={contract} item={item} handleCommentRespond={(i,respond) => this.handleCommentRespond(i,respond)} respond={''}/>
         )
     })
 
@@ -216,7 +210,6 @@ class CommentBoard extends Component {
           <div className="row">
             {postIts}
           </div>
-
 
           <div className="border p-2 m-2">
             <h3>發表你的看法吧</h3>

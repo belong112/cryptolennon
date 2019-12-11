@@ -3,11 +3,7 @@ import {NavLink, Link} from "react-router-dom";
 
 import test1 from "../img/tsai.jpg"
 
-import data from "../data.js"
-
-
-let questions = data.questions
-let items = data.items
+let items = []
 class Homepage extends Component {
    constructor (props) {
     super(props);
@@ -18,8 +14,41 @@ class Homepage extends Component {
       genre: "",
       textarea: "",
       subtitle: "",
+      questions: []
     }
   }
+
+  componentDidMount = async () => {
+    const {contract} = this.state
+    try {
+      var l = await contract.methods.get_question_length().call()
+
+      var temparray= []
+      for (var i = 0; i < l; i++) {
+        var temp = await contract.methods.get_question(i).call()
+        console.log(temp)
+        const newitem = {
+          id: i.toString(),
+          genre: 'Life',
+          title: temp[0].toString(),
+          subtitle: 'N/A',
+          num_comments: temp[1].length,
+        }
+        temparray.push(newitem)
+      }
+
+      this.setState({
+        questions: temparray
+      })
+
+    } catch (error) {
+      alert(
+        `Failed to load web3, accounts, or contract. Check console for details.`
+      );
+      console.error(error);
+    }
+  };
+
 
    handleTxtOnchange = (e) =>{
     this.setState({
@@ -39,8 +68,9 @@ class Homepage extends Component {
   }
 
   onSubmit = () =>{
-    const {genre, textarea, subtitle} = this.state
-    questions.push({
+    const {genre, textarea, subtitle, questions} = this.state
+    var temparray = questions.concat()
+    temparray.push({
       id: 140000 + (Math.random() * (10000)),
       genre: genre,
       title:textarea,
@@ -55,14 +85,20 @@ class Homepage extends Component {
   }
 
   render() {
-    const questionArray = questions.map((item,index) =>{
-      var q = "["+(item.genre)+"] "+(item.title)
+    const questionArray = this.state.questions.map((item,index) =>{
+      // var q = "["+(item.genre)+"] "+(item.title)
       return(
-        <Link to={"/commentboard/"+(index)} className="d-flex justify-content-between align-items-center list-group-item list-group-item-action">{q}<span className={"badge badge-pill "+(item.num_comments > 10 ? 'badge-danger':'badge-secondary')}>{item.num_comments}</span></Link>
+        <Link to={"/commentboard/"+(index)} className="d-flex justify-content-between align-items-center list-group-item list-group-item-action">{item.title}<span className={"badge badge-pill "+(item.num_comments > 10 ? 'badge-danger':'badge-secondary')}>{item.num_comments}</span></Link>
       )
     })
 
-    var sortarray = questions.concat().sort((b, a) => (a.num_comments) - (b.num_comments));
+    //var sortarray = questions.concat().sort((b, a) => (a.num_comments) - (b.num_comments));
+    var sortarray = this.state.questions.concat().sort((b,a) =>(a.num_comments - b.num_comments));
+
+    let raedy= false
+    if (sortarray.length !== 0){
+      raedy = true
+    }
 
     var sectionStyle = {
       width: "100%",
@@ -70,37 +106,37 @@ class Homepage extends Component {
       backgroundPosition: "center 90%", 
       backgroundSize:"100%",
     };
-
+    if(raedy)
     return (
       <div className='container'>
         <div className="nav-scroller py-1 mb-2 bg-white">
           
         </div>
         <div className='bg-light pb-5 px-2'>
-        	<div className="jumbotron p-4 p-md-5 text-white rounded bg-dark" style={sectionStyle}>
+          <div className="jumbotron p-4 p-md-5 text-white rounded bg-dark" style={sectionStyle}>
             <div className="col-md-6 px-0 text-left">
               <p className="lead my-3">發燒話題</p>
-              <h4 className='text-danger'>{sortarray[0].genre}</h4>
+              <h4 className='text-danger'>Life</h4>
               <h1 className="display-4 ">{sortarray[0].title}</h1>         
               <p className="lead mb-0"><NavLink className="text-white font-weight-bold" to={"/commentboard/"+(sortarray[0].id)}>進入討論區</NavLink></p>
-            </div>
+            </div> 
           </div>
           <div className="row mb-2">
-          <div className="col-md-6">
-            <div className="row no-gutters border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
-              <div className="col p-4 d-flex flex-column position-static">
-                <strong className="d-inline-block mb-2 text-primary">{sortarray[1].genre}</strong>
-                <h3 className="mb-0">{sortarray[1].title}</h3>
-                <div className="mb-1 text-muted">Nov 12</div>
-                <p className="card-text mb-auto">{sortarray[1].subtitle}</p>
-                <Link to={"/commentboard/"+(sortarray[1].id)}>go to commentboard</Link>
+            <div className="col-md-6">
+              <div className="row no-gutters border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
+                <div className="col p-4 d-flex flex-column position-static">
+                  <strong className="d-inline-block mb-2 text-primary">Life</strong>
+                  <h3 className="mb-0">{sortarray[1].title}</h3>
+                  <div className="mb-1 text-muted">Nov 12</div>
+                  <p className="card-text mb-auto">{sortarray[1].subtitle}</p>
+                  <Link to={"/commentboard/"+(sortarray[1].id)}>go to commentboard</Link>
+                </div>
               </div>
-            </div>
           </div>
           <div className="col-md-6">
             <div className="row no-gutters border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
               <div className="col p-4 d-flex flex-column position-static">
-                <strong className="d-inline-block mb-2 text-success">{sortarray[2].genre}</strong>
+                <strong className="d-inline-block mb-2 text-success">Life</strong>
                 <h3 className="mb-0">{sortarray[2].title}</h3>
                 <div className="mb-1 text-muted">Nov 11</div>
                 <p className="mb-auto">{sortarray[2].subtitle}</p>
@@ -142,6 +178,12 @@ class Homepage extends Component {
       </div>
     </div>
     );
+    else
+      return(
+        <div class="spinner-border" style={{width: '3rem', height: '3rem'}} role="status">
+          <span class="sr-only">Loading...</span>
+        </div>
+      )
   }
 }
 export default Homepage;
