@@ -41,9 +41,18 @@ contract Lennon is Ownable {
 
     constructor() public {
         Accounts.push(Account("admin", 0, 0, 0));
+
+        Accounts.push(Account("bitch", 1, 2, 1998));
+        owner_to_id[address(1)] = 1;
+        Accounts.push(Account("hello", 3, 10, 1998));
+        owner_to_id[address(2)] = 2;
+        Accounts.push(Account('做愛', 8, 26, 1996));
+        owner_to_id[address(3)] = 3;
+
         Questions.push(Question("你支持反送中嗎?", new uint[](0)));
         Questions.push(Question("你喜歡吃香菜嗎?", new uint[](0)));
         Questions.push(Question("2020。歸。投。韓下去?", new uint[](0)));
+
         Replies.push(Reply("我支持港警", false, 0, 0, new uint[](0)));
         Questions[0].replies.push(0);
         Replies.push(Reply("支持香菜英文", true, 1, 0, new uint[](0)));
@@ -52,6 +61,12 @@ contract Lennon is Ownable {
         Questions[1].replies.push(2);
         Replies.push(Reply("習維尼尼瑪八七", true, 3, 0, new uint[](0)));
         Questions[0].replies.push(3);
+
+        Replies[0].likes.push(1);
+        Replies[1].likes.push(1);
+        Replies[2].likes.push(2);
+        Replies[1].likes.push(3);
+        Replies[3].likes.push(3);
     }
 
     // only owner of the contract can create a question
@@ -92,14 +107,14 @@ contract Lennon is Ownable {
 
     // get name and birthday of the user
     function get_account() external view needAccount returns(string memory, uint8, uint8, uint16) {
-        Account storage a = Accounts[owner_to_id[msg.sender]];
+        Account memory a = Accounts[owner_to_id[msg.sender]];
         return (a.name, a.birth_day, a.birth_month, a.birth_year);
     }
 
     // get name and birthday of the user given id
     function get_account(uint _id) external view returns(string memory, uint8, uint8, uint16) {
         require(_id != 0, "id should not be 0");
-        Account storage a = Accounts[_id];
+        Account memory a = Accounts[_id];
         return (a.name, a.birth_day, a.birth_month, a.birth_year);
     }
 
@@ -121,7 +136,7 @@ contract Lennon is Ownable {
 
     // get reply, endorse, time, owner_id and #likes of _r_idx(th) reply to the question with id = _q_id
     function get_reply(uint _q_id, uint _r_idx ) external view returns(string memory, bool, uint, uint, uint) {
-        Reply storage r = Replies[Questions[_q_id].replies[_r_idx]];
+        Reply memory r = Replies[Questions[_q_id].replies[_r_idx]];
         return (r.reply, r.endorse, r.time, r.owner_id, r.likes.length);
     }
 
