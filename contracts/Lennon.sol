@@ -42,11 +42,11 @@ contract Lennon is Ownable {
     constructor() public {
         Accounts.push(Account("admin", 0, 0, 0));
 
-        Accounts.push(Account("bitch", 1, 2, 1998));
+        Accounts.push(Account("鄭禕仁", 1, 2, 1987));
         owner_to_id[address(1)] = 1;
-        Accounts.push(Account("hello", 3, 10, 1998));
+        Accounts.push(Account("邱昱禎", 8, 20, 1911));
         owner_to_id[address(2)] = 2;
-        Accounts.push(Account('做愛', 8, 26, 1996));
+        Accounts.push(Account('陳建成', 8, 26, 1996));
         owner_to_id[address(3)] = 3;
 
         Questions.push(Question("你支持反送中嗎?", new uint[](0)));
