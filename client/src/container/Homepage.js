@@ -26,13 +26,13 @@ class Homepage extends Component {
       var temparray= []
       for (var i = 0; i < l; i++) {
         var temp = await contract.methods.get_question(i).call()
-        console.log(temp)
+        var temp2 = await contract.methods.get_reply_length(i).call()
         const newitem = {
           id: i.toString(),
           genre: 'Life',
           title: temp[0].toString(),
           subtitle: 'N/A',
-          num_comments: temp[1].length,
+          num_comments: temp2
         }
         temparray.push(newitem)
       }
@@ -67,20 +67,22 @@ class Homepage extends Component {
     })
   }
 
-  onSubmit = () =>{
-    const {genre, textarea, subtitle, questions} = this.state
+  onSubmit = async () =>{
+    const {genre, textarea, subtitle, questions,contract,accounts} = this.state
+    await contract.methods.create_question(textarea).call({from:accounts[0]})
+    var l = await contract.methods.get_question_length().call()
     var temparray = questions.concat()
     temparray.push({
-      id: 140000 + (Math.random() * (10000)),
-      genre: genre,
-      title:textarea,
-      subtitle:subtitle,
-      num_comments:0
+      id: l,
+      genre: 'Life',
+      title: textarea,
+      subtitle: 'N/A',
+      num_comments: 0
     });
-    items.push([])
     this.setState({
       subtitle:"",
-      textarea:""
+      textarea:"",
+      questions: temparray
     });
   }
 

@@ -21,7 +21,7 @@ class PostIt extends Component {
     const owner_id = this.props.item.owner_id
     try {
       // get owner name and age
-      let temp = await contract.methods.get_account(0).call();
+      let temp = await contract.methods.get_account(owner_id).call();
       console.log(temp)
       const owner = {
         name: temp[0],
