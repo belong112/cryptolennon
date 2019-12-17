@@ -6,8 +6,6 @@ import {getDateTime} from "../utils/utils.js";
 
 import "../App.css";
 
-
-let items = []
 class CommentBoard extends Component {
    constructor (props) {
     super(props);
