@@ -77,7 +77,7 @@ class CommentBoard extends Component {
       temparray = comments.concat().sort((a, b) => (a.id) - (b.id));
     }
     else if(e.target.value === 'likes'){
-      temparray = comments.concat().sort((a, b) => (b.respond.positive) - (a.respond.positive));
+      temparray = comments.concat().sort((a, b) => (b.num_likes) - (a.num_likes));
     }
     this.setState({
       currentarray:temparray
@@ -97,9 +97,7 @@ class CommentBoard extends Component {
   }
 
   onSubmit = async () => {
-    const {question, comments, textarea, agree, user, contract, accounts} = this.state;
-
-    
+    const {question, comments, textarea, agree, contract, accounts} = this.state;
 
     if (textarea === ""){
       alert("你還沒寫下意見")
@@ -110,17 +108,12 @@ class CommentBoard extends Component {
       console.log(time)
       await contract.methods.create_reply(question.q_id, textarea, agree, time).send({from: accounts[0]});
 
-      comments.unshift({
-        id: 15000 + (Math.random() * (1000)),
+      comments.push({
         comment:textarea,
         endorse:agree,
-        name:user.name,
-        age:user.age,
-        color: agree === 'f' ? 'pink' : 'green',
-        respond:{
-            "positive":0,
-            "negative":0
-          }
+        time: time,
+        owner_id: 0, // 先寫死 之後要改
+        num_likes: 0,
       });
     }
     this.setState({
@@ -129,41 +122,46 @@ class CommentBoard extends Component {
     });
   }
 
-  handleCommentRespond = (id,respond) => {
-    const {user, comments} = this.state;
+  handleCommentRespond = async(r_id) => {
+    const {comments, contract, accounts, question} = this.state;
+    // const index = user.history.findIndex(item => item.id === id);
+    // const respondHistory = user.history[index];  //user's respond history 
     
-    const index = user.history.findIndex(item => item.id === id);
-    const respondHistory = user.history[index];  //user's respond history 
+    // const commentIdx = comments.findIndex(item => item.id === id);
+
+    // if (!respondHistory) {    // Not yet responded before
+    //   user.history.push({
+    //     id:id,
+    //     respond:respond,
+    //   });
+    //   comments[commentIdx].num_likes += 1;
+    // }
+    // else {
+    //   if (!respondHistory.respond) {   
+    //     respondHistory.respond = 'positive';
+    //     comments[commentIdx].num_likes += 1;
+    //   } else {       // 收回讚
+    //     respondHistory.respond = null;
+    //     comments[commentIdx].num_likes -= 1;
+    //   }
+
+    //   user.history.splice(index,1,respondHistory);
+    //}
     
-    const commentIdx = comments.findIndex(item => item.id === id);
 
-    if (!respondHistory) {    // Not yet responded before
-      user.history.push({
-        id:id,
-        respond:respond,
-      });
-      comments[commentIdx].num_likes += 1;
-    }
-    else {
-      if (!respondHistory.respond) {   
-        respondHistory.respond = 'positive';
-        comments[commentIdx].num_likes += 1;
-      } else {       // 收回讚
-        respondHistory.respond = null;
-        comments[commentIdx].num_likes -= 1;
-      }
+    await contract.methods.like(question.q_id, r_id).send({from: accounts[0]})
 
-      user.history.splice(index,1,respondHistory);
-    }
+    var new_comments = comments
+    new_comments[r_id].num_likes+=1
 
     this.setState({
-      user:user,
-      comments:comments
+      //user:user,
+      comments:new_comments
     });
   }
 
   render() {
-    const { currentarray,user,question,contract } = this.state;
+    const { currentarray,question,contract } = this.state;
     const postIts = currentarray.map((item,index) =>{
       // const i = user.history.findIndex(userhistory => userhistory.id === item.id);
       // var myRespond = null

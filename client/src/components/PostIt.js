@@ -36,8 +36,8 @@ class PostIt extends Component {
     }
   }
 
-  handleCommentRespond = (id,respond) =>{
-    this.props.handleCommentRespond(id,respond)
+  handleCommentRespond = (id) =>{
+    this.props.handleCommentRespond(id)
   }
 
   render() {   
@@ -57,7 +57,7 @@ class PostIt extends Component {
             <div className="text-secondary">{this.state.owner.age || "?"}歲，{this.state.owner.name||"?"}</div>
           </div>
           <div className="buttongroup">
-            <IconButton onClick={()=>{this.handleCommentRespond(this.props.item.id,'positive')}} spacing={2}>
+            <IconButton onClick={()=>{this.handleCommentRespond(this.props.item.id)}} spacing={2}>
               <Badge badgeContent={this.props.item.num_likes} color="primary">
                 <ThumbUpIcon color={(this.props.respond === 'positive' ? 'primary':'')} />
               </Badge>
