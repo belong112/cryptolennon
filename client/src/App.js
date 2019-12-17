@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import {Route, BrowserRouter} from "react-router-dom"
 
-import SimpleStorageContract from "./contracts/SimpleStorage.json";
 import LennonContract from "./contracts/Lennon.json";
 
 import getWeb3 from "./getWeb3";
@@ -45,6 +44,7 @@ class App extends Component {
         LennonContract.abi,
         deployedNetwork && deployedNetwork.address,
       );
+      console.log(deployedNetwork.address)
 
       // Set web3, accounts, and contract to the state, and then proceed with an
       // example of interacting with the contract's methods.
@@ -59,31 +59,26 @@ class App extends Component {
   };
 
   runExample = async () => {
-    const { accounts, contract } = this.state;
+    //const { accounts, contract } = this.state;
 
+    // success
     // const t1 = await contract.methods.get_question(0).call();
+    // console.log(t1); 
 
+    // success
     // await contract.methods.create_question('幹你娘?').send({from: accounts[0]});
     // const t2 = await contract.methods.get_question(3).call();
     // console.log(t2);
 
-    // await contract.methods.create_account('bitch', 1, 2, 1998).send({from: accounts[0]});
-    try {
-      const result = await contract.methods.get_account().call({from:accounts[2000]})
-    } 
-    catch (err){
-      console.log("error")
-      console.log(err);
-    }
+    // failed
+    // const t3 = await contract.methods.get_account().call();
+    // console.log(t3);
 
-    const t4 = await contract.methods.get_reply(0, 0).call();
-
-
-
-    
+    //fail
+    // const t4 = await contract.methods.get_reply(0, 0).call({from: accounts[0]});
+    // console.log(t4);
+ 
   }
-
-
 
   render() {
     if (!this.state.web3) {

@@ -41,17 +41,32 @@ contract Lennon is Ownable {
 
     constructor() public {
         Accounts.push(Account("admin", 0, 0, 0));
+
+        Accounts.push(Account("鄭禕仁", 1, 2, 1987));
+        owner_to_id[address(1)] = 1;
+        Accounts.push(Account("邱昱禎", 8, 20, 1911));
+        owner_to_id[address(2)] = 2;
+        Accounts.push(Account('陳建成', 8, 26, 1996));
+        owner_to_id[address(3)] = 3;
+
         Questions.push(Question("你支持反送中嗎?", new uint[](0)));
         Questions.push(Question("你喜歡吃香菜嗎?", new uint[](0)));
         Questions.push(Question("2020。歸。投。韓下去?", new uint[](0)));
-        Replies.push(Reply("我支持港警", false, 0, 0, new uint[](0)));
+
+        Replies.push(Reply("我支持港警", false, 0, 1, new uint[](0)));
         Questions[0].replies.push(0);
-        Replies.push(Reply("支持香菜英文", true, 1, 0, new uint[](0)));
+        Replies.push(Reply("支持香菜英文", true, 1, 2, new uint[](0)));
         Questions[1].replies.push(1);
-        Replies.push(Reply("我是鋼鐵韓粉，氣氣氣氣氣!", false, 2, 0, new uint[](0)));
+        Replies.push(Reply("我是鋼鐵韓粉，氣氣氣氣氣!", false, 2, 3, new uint[](0)));
         Questions[1].replies.push(2);
-        Replies.push(Reply("習維尼尼瑪八七", true, 3, 0, new uint[](0)));
+        Replies.push(Reply("習維尼尼瑪八七", true, 3, 3, new uint[](0)));
         Questions[0].replies.push(3);
+
+        Replies[0].likes.push(1);
+        Replies[1].likes.push(1);
+        Replies[2].likes.push(2);
+        Replies[1].likes.push(3);
+        Replies[3].likes.push(3);
     }
 
     // only owner of the contract can create a question

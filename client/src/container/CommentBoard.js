@@ -1,25 +1,23 @@
 import React, { Component } from "react";
 
-import SimpleStorageContract from "../contracts/SimpleStorage.json";
-import getWeb3 from "../getWeb3";
 import PostIt from "../components/PostIt.js";
+
+import {getDateTime} from "../utils/utils.js";
 
 import "../App.css";
 
-import data from "../data.js"
 
 let items = []
-let question = []
 class CommentBoard extends Component {
    constructor (props) {
     super(props);
-    items = data.items[this.props.id]
-    question = data.questions[this.props.id]
     this.state = { 
-      web3: null, 
-      accounts: null, 
-      contract: null,
-      currentitems: items,
+      web3: this.props.web3,
+      accounts: this.props.accounts,
+      contract: this.props.contract,
+      comments: [],  // 真實資料
+      currentarray: [],  // filter後的
+      question: "",
       textarea: "",
       agree: null,
       user: {
@@ -34,65 +32,57 @@ class CommentBoard extends Component {
   }
 
   componentDidMount = async () => {
+    const {contract,accounts} = this.state
+    const q_id = this.props.id
     try {
-      // Get network provider and web3 instance.
-      const web3 = await getWeb3();
-      // Use web3 to get the user's accounts.
-      const accounts = await web3.eth.getAccounts();
+      // get question
+      var temp = await contract.methods.get_question(q_id).call()
+      const question = {
+        genre: 'Life',
+        q_id: q_id,
+        title: temp[0].toString(),
+        subtitle: 'N/A'
+      }
 
-      // Get the contract instance.
-      const networkId = await web3.eth.net.getId();
-      const deployedNetwork = SimpleStorageContract.networks[networkId];
-      const instance = new web3.eth.Contract(
-        SimpleStorageContract.abi,
-        deployedNetwork && deployedNetwork.address,
-      );
+      // get reply
+      var l = await contract.methods.get_reply_length(q_id).call()
 
-      // Set web3, accounts, and contract to the state, and then proceed with an
-      // example of interacting with the contract's methods.
-      this.setState({ web3, accounts, contract: instance});
+      var temparray= []
+      for (var i = 0; i < l; i++) {
+        temp = await contract.methods.get_reply(q_id, i).call({from: accounts[0]})
+        const newitem = {
+          id: i.toString(),
+          comment: temp[0].toString(),
+          endorse: temp[1],
+          time: temp[2],
+          owner_id: temp[3],
+          num_likes: parseInt(temp[4]),
+        }
+        temparray.push(newitem)
+      }
+
+      this.setState({
+        question: question,
+        comments: temparray,
+        currentarray: temparray
+      })
+
     } catch (error) {
-      // Catch any errors for any of the above operations.
-      alert(
-        `Failed to load web3, accounts, or contract. Check console for details.`,
-      );
-      console.error(error);
+      alert( error );
     }
-  };
-
-  runExample = async () => {
-    const { accounts, contract } = this.state;
-
-    // Stores a given value, 5 by default.
-    await contract.methods.set(1000).send({ from: accounts[0] });
-
-    // Get the value from the contract to prove it worked.
-    const response = await contract.methods.get().call();
-
-    // Update state with the result.
-    this.setState({ storageValue: response });
   };
 
   handleSelectOnchange = (e)=>{
+    const {comments} = this.state
     var temparray = []
-    if(e.target.value === 'support')
-      temparray = items.filter((item)=>{
-        return item.agree === 'y';       // 取得大於五歲的
-      });
-    else if(e.target.value === 'oppose')
-      temparray = items.filter((item)=>{
-        return item.agree === 'f';       // 取得大於五歲的
-      });
-    else if(e.target.value === 'all')
-      temparray = items
-    else if(e.target.value === 'time'){
-      temparray = items.concat().sort((a, b) => (a.id) - (b.id));
+    if(e.target.value === 'time'){
+      temparray = comments.concat().sort((a, b) => (a.id) - (b.id));
     }
     else if(e.target.value === 'likes'){
-      temparray = items.concat().sort((a, b) => (b.respond.positive) - (a.respond.positive));
+      temparray = comments.concat().sort((a, b) => (b.respond.positive) - (a.respond.positive));
     }
     this.setState({
-      currentitems:temparray
+      currentarray:temparray
     })
   }
 
@@ -108,17 +98,24 @@ class CommentBoard extends Component {
     })
   }
 
-  onSubmit = () => {
-    const {textarea,agree,user} = this.state
-    if (textarea === "")
+  onSubmit = async () => {
+    const {question, comments, textarea, agree, user, contract, accounts} = this.state;
+
+    
+
+    if (textarea === ""){
       alert("你還沒寫下意見")
-    else if (agree === null)
+    } else if (agree === null) {
       alert('你還沒選擇支持或反對')
-    else  
-      items.unshift({
+    } else {
+      const time = getDateTime();
+      console.log(time)
+      await contract.methods.create_reply(question.q_id, textarea, agree, time).send({from: accounts[0]});
+
+      comments.unshift({
         id: 15000 + (Math.random() * (1000)),
-        agree:agree,
-        text:textarea,
+        comment:textarea,
+        endorse:agree,
         name:user.name,
         age:user.age,
         color: agree === 'f' ? 'pink' : 'green',
@@ -127,72 +124,54 @@ class CommentBoard extends Component {
             "negative":0
           }
       });
-    
+    }
     this.setState({
-      agree:null,
+      agree: null,
       textarea:""
     });
   }
 
   handleCommentRespond = (id,respond) => {
-    const {user} = this.state;
+    const {user, comments} = this.state;
+    
     const index = user.history.findIndex(item => item.id === id);
-    const item = user.history[index];
-    const index2 = items.findIndex(item2 => item2.id === id);
-    const item2 = items[index2] 
+    const respondHistory = user.history[index];  //user's respond history 
+    
+    const commentIdx = comments.findIndex(item => item.id === id);
 
-    if (!item) {    // Not yet responded before
+    if (!respondHistory) {    // Not yet responded before
       user.history.push({
         id:id,
         respond:respond,
       });
-      if (respond === 'positive')
-        item2.respond.positive += 1;
-      else
-        item2.respond.negative += 1;
-    } 
+      comments[commentIdx].num_likes += 1;
+    }
     else {
-      if (item.respond === respond) {   // 收回
-        item.respond = null;
-        if (respond === 'positive')
-          item2.respond.positive -= 1;
-        else
-          item2.respond.negative -= 1;
-      } 
-      else if(item.respond === null){  // 原本無
-        item.respond = respond;
-        if (respond === 'positive')
-          item2.respond.positive += 1;
-        else
-          item2.respond.negative += 1;
+      if (!respondHistory.respond) {   
+        respondHistory.respond = 'positive';
+        comments[commentIdx].num_likes += 1;
+      } else {       // 收回讚
+        respondHistory.respond = null;
+        comments[commentIdx].num_likes -= 1;
       }
-      else{                           //交換
-        item.respond = respond;
-        if (respond === 'positive'){
-          item2.respond.positive += 1;
-          item2.respond.negative -= 1;
-        }else{
-          item2.respond.negative += 1;
-          item2.respond.positive -= 1;
-        }
-      }
-      user.history.splice(index,1,item);
-    } 
+
+      user.history.splice(index,1,respondHistory);
+    }
 
     this.setState({
       user:user,
-      currentitems:items
-    });   
+      comments:comments
+    });
   }
 
   render() {
-    const { currentitems,user } = this.state;
-    const postIts = currentitems.map((item,index) =>{
-      const i = user.history.findIndex(userhistory => userhistory.id === item.id);
-      var myRespond = null
-      if(i>=0) myRespond = user.history[i].respond
+    const { currentarray,user,question,contract } = this.state;
+    const postIts = currentarray.map((item,index) =>{
+      // const i = user.history.findIndex(userhistory => userhistory.id === item.id);
+      // var myRespond = null
+      // if(i>=0) myRespond = user.history[i].respond
         return(
-          <PostIt item={item} handleCommentRespond={(i,respond) => this.handleCommentRespond(i,respond)} respond={myRespond}/>
+          <PostIt contract={contract} item={item} handleCommentRespond={(i,respond) => this.handleCommentRespond(i,respond)} respond={''}/>
         )
     })
 
@@ -216,7 +195,6 @@ class CommentBoard extends Component {
           <div className="row">
             {postIts}
           </div>
-
 
           <div className="border p-2 m-2">
             <h3>發表你的看法吧</h3>
