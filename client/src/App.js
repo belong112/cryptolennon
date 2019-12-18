@@ -21,11 +21,11 @@ class App extends Component {
       accounts: null, 
       contract: null,
       user: {
-        name:"鄭伊人",
+        name:"",
         age: 22,
-        history:[ // record user's respond to each comment
-          {id:'1574752132567',respond:'positive'},
-        ]
+        year: 2019,
+        month: 12,
+        day: 12
       },    
     };
   }
@@ -59,8 +59,13 @@ class App extends Component {
   };
 
   runExample = async () => {
-    //const { accounts, contract } = this.state;
+    const { accounts, contract } = this.state;
 
+    await contract.methods.create_account("語境",5,27,1998).send({from: accounts[0]});
+
+    // await contract.methods.create_question('幹娘').send({from: accounts[0]});
+    // const t2 = await contract.methods.get_question(3).call();
+    // console.log(t2);
     // success
     // const t1 = await contract.methods.get_question(0).call();
     // console.log(t1); 
@@ -84,9 +89,9 @@ class App extends Component {
     if (!this.state.web3) {
       return <div>Loading Web3, accounts, and contract...!!!!!!!</div>;
     }
-    const CommentPage = (props) => { return ( <CommentBoard web3={this.state.web3} accounts={this.state.accounts} contract={this.state.contract} id={props.match.params.boardid} />)};
+    const CommentPage = (props) => { return ( <CommentBoard  web3={this.state.web3} accounts={this.state.accounts} contract={this.state.contract} user={this.state.user} id={props.match.params.boardid} />)};
     const UserPage = (props) =>{ return ( <Userpage user={this.state.user} />)};
-    const HomePage = (props) =>{ return ( <Homepage web3={this.state.web3} accounts={this.state.accounts} contract={this.state.contract} />)}
+    const HomePage = (props) =>{ return ( <Homepage web3={this.state.web3} accounts={this.state.accounts} contract={this.state.contract} user={this.state.user} />)}
     return (
       <BrowserRouter> 
         <div className='App'>

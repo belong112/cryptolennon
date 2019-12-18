@@ -17,14 +17,8 @@ class CommentBoard extends Component {
       currentarray: [],  // filter後的
       question: "",
       textarea: "",
-      agree: null,
-      user: {
-        name:"鄭伊人",
-        age: 22,
-        history:[ // record user's respond to each comment
-          {id:'1574752132567',respond:'positive'},
-        ]
-      },
+      agree: 'y',
+      user: this.props.user
       
     };
   }
@@ -60,9 +54,9 @@ class CommentBoard extends Component {
       }
 
       this.setState({
-        question: question,
-        comments: temparray,
-        currentarray: temparray
+        question: question, //問題(data)
+        comments: temparray, //回復(data)
+        currentarray: temparray //當前頁面上的回覆
       })
 
     } catch (error) {
@@ -73,10 +67,13 @@ class CommentBoard extends Component {
   handleSelectOnchange = (e)=>{
     const {comments} = this.state
     var temparray = []
-    if(e.target.value === 'time'){
+    if(e.target.value === 'oppose'){
+      temparray = comments.concat().filter(item => item.endorse === false)
+    }else if(e.target.value === 'support'){
+      temparray = comments.concat().filter(item => item.endorse === true)
+    }else if(e.target.value === 'time' ){
       temparray = comments.concat().sort((a, b) => (a.id) - (b.id));
-    }
-    else if(e.target.value === 'likes'){
+    }else if(e.target.value === 'likes'){
       temparray = comments.concat().sort((a, b) => (b.num_likes) - (a.num_likes));
     }
     this.setState({
@@ -107,17 +104,19 @@ class CommentBoard extends Component {
       const time = getDateTime();
       console.log(time)
       await contract.methods.create_reply(question.q_id, textarea, agree, time).send({from: accounts[0]});
+      var l = comments.length
 
       comments.push({
+        id: l,
         comment:textarea,
         endorse:agree,
         time: time,
-        owner_id: 0, // 先寫死 之後要改
+        owner_id: 2, // 先寫死 之後要改
         num_likes: 0,
       });
     }
     this.setState({
-      agree: null,
+      agree: 'y',
       textarea:""
     });
   }
@@ -148,12 +147,13 @@ class CommentBoard extends Component {
     //   user.history.splice(index,1,respondHistory);
     //}
     
-
-    await contract.methods.like(question.q_id, r_id).send({from: accounts[0]})
-
-    var new_comments = comments
-    new_comments[r_id].num_likes+=1
-
+    try{
+      await contract.methods.like(question.q_id, r_id).send({from: accounts[0]})
+      var new_comments = comments
+      new_comments[r_id].num_likes+=1
+    } catch(err){
+      alert('要先創建帳號喔')
+    }
     this.setState({
       //user:user,
       comments:new_comments
@@ -183,9 +183,10 @@ class CommentBoard extends Component {
               <label className="input-group-text" for="inputGroupSelect01">排序</label>
             </div>
             <select className="custom-select" id='inputGroupSelect01' onChange={this.handleSelectOnchange}>
-              <option value='all' selected>全部</option>
               <option value="time">照時間</option>
               <option value='likes'>照讚數</option>
+              <option value='support'>支持方</option>
+              <option value='oppose'> 反對方 </option>              
             </select>
           </div>
           <div className="row">

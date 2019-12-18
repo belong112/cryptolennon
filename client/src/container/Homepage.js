@@ -14,7 +14,8 @@ class Homepage extends Component {
       genre: "",
       textarea: "",
       subtitle: "",
-      questions: []
+      questions: [],
+      user: this.props.user
     }
   }
 
