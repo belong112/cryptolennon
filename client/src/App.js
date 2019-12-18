@@ -61,11 +61,11 @@ class App extends Component {
   runExample = async () => {
     const { accounts, contract } = this.state;
 
-    await contract.methods.create_account("語境",5,27,1998).send({from: accounts[0]});
+    //await contract.methods.create_account("雨境",5,27,1998).send({from: accounts[0]});
 
-    // await contract.methods.create_question('幹娘').send({from: accounts[0]});
-    // const t2 = await contract.methods.get_question(3).call();
-    // console.log(t2);
+    // await contract.methods.create_question().send({from: accounts[0]});
+    //const t2 = await contract.methods.get_question(3).call();
+    //console.log(t2);
     // success
     // const t1 = await contract.methods.get_question(0).call();
     // console.log(t1); 

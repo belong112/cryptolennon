@@ -103,13 +103,14 @@ class CommentBoard extends Component {
     } else {
       const time = getDateTime();
       console.log(time)
-      await contract.methods.create_reply(question.q_id, textarea, agree, time).send({from: accounts[0]});
+      var endorse = (agree === 'y' ? true : false)
+      await contract.methods.create_reply(question.q_id, textarea, endorse, time).send({from: accounts[0]});
       var l = comments.length
 
       comments.push({
         id: l,
         comment:textarea,
-        endorse:agree,
+        endorse:endorse,
         time: time,
         owner_id: 2, // 先寫死 之後要改
         num_likes: 0,
@@ -117,7 +118,9 @@ class CommentBoard extends Component {
     }
     this.setState({
       agree: 'y',
-      textarea:""
+      textarea:"",
+      comments: comments, //回復(data)
+      currentarray: comments //當前頁面上的回覆
     });
   }
 
@@ -152,7 +155,7 @@ class CommentBoard extends Component {
       var new_comments = comments
       new_comments[r_id].num_likes+=1
     } catch(err){
-      alert('要先創建帳號喔')
+      alert(err)
     }
     this.setState({
       //user:user,

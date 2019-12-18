@@ -22,7 +22,6 @@ class PostIt extends Component {
     try {
       // get owner name and age
       let temp = await contract.methods.get_account(owner_id).call();
-      console.log(temp)
       const owner = {
         name: temp[0],
         age: 2019 - temp[3]

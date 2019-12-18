@@ -70,7 +70,7 @@ class Homepage extends Component {
 
   onSubmit = async () =>{
     const {genre, textarea, subtitle, questions,contract,accounts} = this.state
-    await contract.methods.create_question(textarea).call({from:accounts[0]})
+    await contract.methods.create_question(textarea).send({from:accounts[0]})
     var l = questions.length
     var temparray = questions.concat()
     temparray.push({
