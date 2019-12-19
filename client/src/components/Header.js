@@ -14,11 +14,11 @@ class Header extends Component {
             <h3 className="blog-header-logo">Crypto-LennonWall</h3>
           </div>
           <div className="col-4">
-            <Link to="/user">
+            <NavLink to="/register">
               <span style={{color:'white'}}>
                 <span className="pr-4">register</span>
               </span>              
-            </Link>
+            </NavLink>
             <Link to="/">
               <span style={{color:'white'}}>
                 <i className="fas fa-home"></i>

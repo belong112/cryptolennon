@@ -9,6 +9,7 @@ import Footer from "./components/Footer.js"
 import CommentBoard from "./container/CommentBoard.js"
 import Homepage from "./container/Homepage.js"
 import Userpage from "./container/UserPage.js"
+import Registerpage from "./container/RegisterPage.js"
 
 import "./App.css";
 
@@ -16,16 +17,14 @@ class App extends Component {
    constructor (props) {
     super(props);
     this.state = { 
-      storageValue: 0, 
       web3: null, 
       accounts: null, 
       contract: null,
       user: {
         name:"",
-        age: 22,
-        year: 2019,
-        month: 12,
-        day: 12
+        b_year: 0,
+        b_month: 0,
+        b_day: 0
       },    
     };
   }
@@ -48,7 +47,7 @@ class App extends Component {
 
       // Set web3, accounts, and contract to the state, and then proceed with an
       // example of interacting with the contract's methods.
-      this.setState({ web3, accounts, contract: instance}, this.runExample);
+      this.setState({ web3, accounts, contract: instance},this.runExample);
     } catch (error) {
       // Catch any errors for any of the above operations.
       alert(
@@ -59,7 +58,7 @@ class App extends Component {
   };
 
   runExample = async () => {
-    const { accounts, contract } = this.state;
+    //const { accounts, contract } = this.state;
 
     //await contract.methods.create_account("雨境",5,27,1998).send({from: accounts[0]});
 
@@ -82,13 +81,26 @@ class App extends Component {
     //fail
     // const t4 = await contract.methods.get_reply(0, 0).call({from: accounts[0]});
     // console.log(t4);
- 
+  }
+  handleregister = async (a,b,c,d) =>{
+    const {contract, accounts} = this.state
+    await contract.methods.create_account("雨境",5,27,1998).send({from: accounts[0]});
+    var fake_user = {
+        name:a,
+        b_year:d,
+        b_month:b,
+        b_day:c
+      }
+    this.setState({
+      user:fake_user
+    })
   }
 
   render() {
     if (!this.state.web3) {
       return <div>Loading Web3, accounts, and contract...!!!!!!!</div>;
     }
+    const RegisterPage = (props) => { return ( <Registerpage handleregister={(a,b,c,d) => this.handleregister(a,b,c,d)} />)};
     const CommentPage = (props) => { return ( <CommentBoard  web3={this.state.web3} accounts={this.state.accounts} contract={this.state.contract} user={this.state.user} id={props.match.params.boardid} />)};
     const UserPage = (props) =>{ return ( <Userpage user={this.state.user} />)};
     const HomePage = (props) =>{ return ( <Homepage web3={this.state.web3} accounts={this.state.accounts} contract={this.state.contract} user={this.state.user} />)}
@@ -97,8 +109,9 @@ class App extends Component {
         <div className='App'>
           <Header user={this.state.user}/>
           <div>
-            <Route exact path='/' render={HomePage} />
             <Route exact path='/user' render={UserPage} />
+            <Route exact path='/register' render={RegisterPage} />
+            <Route exact path='/' render={HomePage} />            
             <Route exact path='/commentboard/:boardid' render={CommentPage} /> 
           </div>
           <Footer/>
