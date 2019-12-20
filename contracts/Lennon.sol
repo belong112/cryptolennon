@@ -7,6 +7,7 @@ contract Lennon is Ownable {
     event newAccount(uint id, string name, uint birth_day, uint birth_month, uint birth_year);
     event newReply(uint question_id, uint reply_id, string reply, bool endorse, uint time, uint owner_id);
     event liked(uint question_id, uint reply_id);
+    event modifyAccount(uint id, string new_name);
 
     struct Account {
         string name;
@@ -70,16 +71,22 @@ contract Lennon is Ownable {
     }
 
     // only owner of the contract can create a question
-    function create_question(string calldata _q) external onlyOwner {
-        Questions.push(Question(_q, new uint[](0)));
+    function create_question(string calldata _q) external onlyOwner  returns(uint) {
+        return Questions.push(Question(_q, new uint[](0))) - 1;
     }
 
     // create an account given name and birthday
-    function create_account(string memory _name, uint8 _d, uint8 _m, uint16 _y) public {
+    function create_account(string memory _name, uint8 _d, uint8 _m, uint16 _y) public returns(uint) {
         require(owner_to_id[msg.sender] == 0, "Cannot create more than one account");
         uint id = Accounts.push(Account(_name, _d, _m, _y)) - 1;
         owner_to_id[msg.sender] = id;
         emit newAccount(id, _name, _d, _m, _y);
+        return id;
+    }
+
+    function modify_account_info(string memory _new_name) public needAccount {
+        Accounts[owner_to_id[msg.sender]].name = _new_name;
+        emit modifyAccount(owner_to_id[msg.sender], _new_name);
     }
 
     // create a reply of a question
@@ -106,9 +113,9 @@ contract Lennon is Ownable {
     }
 
     // get name and birthday of the user
-    function get_account() external view needAccount returns(string memory, uint8, uint8, uint16) {
+    function get_account() external view needAccount returns(uint, string memory, uint8, uint8, uint16) {
         Account memory a = Accounts[owner_to_id[msg.sender]];
-        return (a.name, a.birth_day, a.birth_month, a.birth_year);
+        return (owner_to_id[msg.sender], a.name, a.birth_day, a.birth_month, a.birth_year);
     }
 
     // get name and birthday of the user given id

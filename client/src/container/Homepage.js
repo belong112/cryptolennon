@@ -68,9 +68,20 @@ class Homepage extends Component {
     })
   }
 
-  onSubmit = async () =>{
+  onSubmit = async () => {
     const {genre, textarea, subtitle, questions,contract,accounts} = this.state
-    await contract.methods.create_question(textarea).send({from:accounts[0]})
+    try { 
+      await contract.methods.create_question(textarea).send({from:accounts[0]})
+    }
+    catch(err){
+      console.log("There is an error while create_question:" + err);
+      this.setState({
+        subtitle:"",
+        textarea:"",
+      });
+      return;
+    }
+
     var l = questions.length
     var temparray = questions.concat()
     temparray.push({

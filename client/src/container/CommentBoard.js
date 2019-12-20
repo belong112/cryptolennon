@@ -104,7 +104,14 @@ class CommentBoard extends Component {
       const time = getDateTime();
       console.log(time)
       var endorse = (agree === 'y' ? true : false)
-      await contract.methods.create_reply(question.q_id, textarea, endorse, time).send({from: accounts[0]});
+      
+      try{ 
+        await contract.methods.create_reply(question.q_id, textarea, endorse, time).send({from: accounts[0]});
+      }
+      catch(err){
+        console.log("There is an error while create_reply:" + err);
+        return;
+      }
       var l = comments.length
 
       comments.push({
