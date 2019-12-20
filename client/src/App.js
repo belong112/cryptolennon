@@ -58,8 +58,21 @@ class App extends Component {
   };
 
   runExample = async () => {
-    //const { accounts, contract } = this.state;
-
+    const { accounts, contract } = this.state;
+    try{
+      const temp = await contract.methods.get_account().call({from: accounts[0]})
+      var fake_user = {
+        name: temp[0],
+        b_year: temp[3],
+        b_month: temp[2],
+        b_day: temp[1]
+      }
+      this.setState({
+        user: fake_user
+      })
+    }catch(err){
+      alert(err)
+    }
     //await contract.methods.create_account("雨境",5,27,1998).send({from: accounts[0]});
 
     // await contract.methods.create_question().send({from: accounts[0]});
@@ -84,7 +97,7 @@ class App extends Component {
   }
   handleregister = async (a,b,c,d) =>{
     const {contract, accounts} = this.state
-    await contract.methods.create_account("雨境",5,27,1998).send({from: accounts[0]});
+    await contract.methods.create_account("雨境",5,27,1998).send({'from': accounts[0]});
     var fake_user = {
         name:a,
         b_year:d,
