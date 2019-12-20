@@ -58,9 +58,8 @@ class App extends Component {
   };
 
   runExample = async () => {
-    //const { accounts, contract } = this.state;
-
-    //await contract.methods.create_account("雨境",5,27,1998).send({from: accounts[0]});
+    // const { accounts, contract } = this.state;
+    // await contract.methods.create_account("雨境",5,27,1998).send({from: accounts[0]});
 
     // await contract.methods.create_question().send({from: accounts[0]});
     //const t2 = await contract.methods.get_question(3).call();
@@ -84,7 +83,17 @@ class App extends Component {
   }
   handleregister = async (a,b,c,d) =>{
     const {contract, accounts} = this.state
-    await contract.methods.create_account("雨境",5,27,1998).send({from: accounts[0]});
+    
+    try { 
+      // await contract.methods.create_account("雨境",5,27,1998).send({from: accounts[0]});
+      // await contract.methods.create_account("雨境",5,27,1998).send({from: accounts[0]});
+
+    }
+    catch(err){
+      console.log("There is an error while create_account:" + err);
+      return;
+    }
+    
     var fake_user = {
         name:a,
         b_year:d,
