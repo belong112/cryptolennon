@@ -72,7 +72,7 @@ contract Lennon is Ownable {
 
     // only owner of the contract can create a question
     function create_question(string calldata _q) external onlyOwner  returns(uint) {
-        return Questions.push(Question(_q, new uint[](0))) - 1;
+        Questions.push(Question(_q, new uint[](0)));
     }
 
     // create an account given name and birthday
@@ -81,7 +81,6 @@ contract Lennon is Ownable {
         uint id = Accounts.push(Account(_name, _d, _m, _y)) - 1;
         owner_to_id[msg.sender] = id;
         emit newAccount(id, _name, _d, _m, _y);
-        return id;
     }
 
     function modify_account_info(string memory _new_name) public needAccount {

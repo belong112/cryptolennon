@@ -35,7 +35,7 @@ class Registerpage extends Component {
 
   onSubmit = () =>{
     const {name, year, month, day} = this.state
-    this.props.handleregister(name, month, day, year)
+    this.props.handleregister(name, day, month, year)
   }
 
 

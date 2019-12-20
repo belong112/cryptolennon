@@ -119,7 +119,7 @@ class CommentBoard extends Component {
         comment:textarea,
         endorse:endorse,
         time: time,
-        owner_id: 2, // 先寫死 之後要改
+        owner_id: this.state.user.id, // 先寫死 之後要改
         num_likes: 0,
       });
     }

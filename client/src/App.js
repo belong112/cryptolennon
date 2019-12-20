@@ -24,7 +24,8 @@ class App extends Component {
         name:"",
         b_year: 0,
         b_month: 0,
-        b_day: 0
+        b_day: 0,
+        id: 0
       },    
     };
   }
@@ -59,20 +60,6 @@ class App extends Component {
 
   runExample = async () => {
     const { accounts, contract } = this.state;
-    try{
-      const temp = await contract.methods.get_account().call({from: accounts[0]})
-      var fake_user = {
-        name: temp[0],
-        b_year: temp[3],
-        b_month: temp[2],
-        b_day: temp[1]
-      }
-      this.setState({
-        user: fake_user
-      })
-    }catch(err){
-      alert(err)
-    }
     //await contract.methods.create_account("雨境",5,27,1998).send({from: accounts[0]});
 
     // await contract.methods.create_question().send({from: accounts[0]});
@@ -97,23 +84,38 @@ class App extends Component {
   }
   handleregister = async (a,b,c,d) =>{
     const {contract, accounts} = this.state
-    await contract.methods.create_account(a,b,c,d).send({'from': accounts[0]});
-    
     try { 
-      // await contract.methods.create_account("雨境",5,27,1998).send({from: accounts[0]});
-      // await contract.methods.create_account("雨境",5,27,1998).send({from: accounts[0]});
-
+      await contract.methods.create_account(a,b,c,d).send({'from': accounts[0]});
+      const t3 = await contract.methods.get_account().call();
     }
     catch(err){
       console.log("There is an error while create_account:" + err);
       return;
     }
     var fake_user = {
-        name:a,
-        b_year:d,
-        b_month:b,
-        b_day:c
-      }
+      id: t3[0],
+      name:a,
+      b_year:d,
+      b_month:b,
+      b_day:c
+    }
+    this.setState({
+      user:fake_user
+    })
+  }
+
+
+  handleAccountChange = async (new_name) =>{
+    const {contract, accounts, user} = this.state
+    try { 
+      await contract.methods.modify_account_info(new_name).send({'from': accounts[0]});
+    }
+    catch(err){
+      console.log("There is an error while updateing name :" + err);
+      return;
+    }
+    var fake_user = user
+    fake_user.name = new_name
     this.setState({
       user:fake_user
     })
@@ -125,7 +127,7 @@ class App extends Component {
     }
     const RegisterPage = (props) => { return ( <Registerpage handleregister={(a,b,c,d) => this.handleregister(a,b,c,d)} />)};
     const CommentPage = (props) => { return ( <CommentBoard  web3={this.state.web3} accounts={this.state.accounts} contract={this.state.contract} user={this.state.user} id={props.match.params.boardid} />)};
-    const UserPage = (props) =>{ return ( <Userpage user={this.state.user} />)};
+    const UserPage = (props) =>{ return ( <Userpage  handleAccountChange={(a) => this.handleAccountChange(a)} user={this.state.user} />)};
     const HomePage = (props) =>{ return ( <Homepage web3={this.state.web3} accounts={this.state.accounts} contract={this.state.contract} user={this.state.user} />)}
     return (
       <BrowserRouter> 
