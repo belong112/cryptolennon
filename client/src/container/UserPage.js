@@ -1,10 +1,12 @@
-import React, { Component } from 'react';
+import React, { Fragment, Component } from 'react';
 
 class Userpage extends Component {
   constructor (props) {
     super(props);
     this.state = {       
+      contract: this.props.contract,
       name: this.props.user.name,
+      all_array: []
     };
   }
 
@@ -16,11 +18,45 @@ class Userpage extends Component {
 
   onSubmit = () =>{
     const {name} = this.state
-    console.log('we')
     this.props.handleAccountChange(name)
   }
 
+  componentDidMount = async () =>{
+    try{
+      const {contract} = this.state
+      var q_id = -1
+      var r_id = -1
+      var array = []
+      while(true){
+        let x =  await contract.methods.get_all_replies(q_id, r_id).call()
+        if (x[0] == -1 && x[1] == -1)
+          break
+        let question = await contract.methods.get_question(x[0]).call()
+        let reply = await contract.methods.get_reply(x[0], x[1]).call()
+        array.push({q:question[0], r:reply[0], time:reply[2]})
+        q_id = x[0]
+        r_id = x[1]     
+      }
+      this.setState({
+        all_array: array
+      })
+    }catch(err){
+      console.log('error')
+    }
+  }
+
   render() {
+    var temp = this.state.all_array.concat().sort((a, b) => (b.time) - (a.time));
+    const comments = temp.map(item => {
+      return(
+        <Fragment>
+          <tr>
+            <th scope="row">{item.q}</th>
+            <th>{item.r}</th>
+          </tr>
+        </Fragment>
+        )
+    })
     return (
       <div className="container">
         <div className="py-5 text-center">          
@@ -33,6 +69,22 @@ class Userpage extends Component {
             <input className="form-control" value={this.state.name} onChange={this.namechange} maxlength="10"/>
           </div>          
           <button onClick={this.onSubmit} className="btn btn-outline-secondary">更新</button>
+        </div>
+        <div className="my-5">
+          <h4>歷史紀錄</h4>
+          <div className="table-wrapper-scroll-y">
+            <table className="table table-bordered table-striped mb-0">
+              <thead>
+                <tr>
+                  <th scope="col">問題</th>
+                  <th scope="col">回應</th>
+                </tr>
+              </thead>
+              <tbody>
+                {comments}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>      
     );

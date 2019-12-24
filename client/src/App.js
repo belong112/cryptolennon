@@ -48,7 +48,7 @@ class App extends Component {
 
       // Set web3, accounts, and contract to the state, and then proceed with an
       // example of interacting with the contract's methods.
-      this.setState({ web3, accounts, contract: instance},this.runExample);
+      this.setState({ web3, accounts, contract: instance},this.getUser);
     } catch (error) {
       // Catch any errors for any of the above operations.
       alert(
@@ -70,7 +70,8 @@ class App extends Component {
     // console.log(t1); 
 
     // success
-    // await contract.methods.create_question('幹你娘?').send({from: accounts[0]});
+    // let qwe = 'qweqe'
+    // await contract.methods.create_question(qwe).send({from: accounts[0]});
     // const t2 = await contract.methods.get_question(3).call();
     // console.log(t2);
 
@@ -82,26 +83,46 @@ class App extends Component {
     // const t4 = await contract.methods.get_reply(0, 0).call({from: accounts[0]});
     // console.log(t4);
   }
+
+  getUser = async () =>{
+    const { contract } = this.state;
+    try{
+      const temp = await contract.methods.get_account().call();
+      var user = {
+        name: temp[1],
+        b_year: temp[4],
+        b_month: temp[3],
+        b_day: temp[2],
+        id: temp[0]
+      }
+      this.setState({
+        user: user
+      })
+    } catch(err){
+      console.log(err)
+    }
+  }
+
   handleregister = async (a,b,c,d) =>{
     const {contract, accounts} = this.state
     try { 
       await contract.methods.create_account(a,b,c,d).send({'from': accounts[0]});
       const t3 = await contract.methods.get_account().call();
+      var fake_user = {
+        id: t3[0],
+        name:a,
+        b_year:d,
+        b_month:b,
+        b_day:c
+      }
+      this.setState({
+        user:fake_user
+      })
     }
     catch(err){
       console.log("There is an error while create_account:" + err);
       return;
     }
-    var fake_user = {
-      id: t3[0],
-      name:a,
-      b_year:d,
-      b_month:b,
-      b_day:c
-    }
-    this.setState({
-      user:fake_user
-    })
   }
 
 
@@ -127,7 +148,7 @@ class App extends Component {
     }
     const RegisterPage = (props) => { return ( <Registerpage handleregister={(a,b,c,d) => this.handleregister(a,b,c,d)} />)};
     const CommentPage = (props) => { return ( <CommentBoard  web3={this.state.web3} accounts={this.state.accounts} contract={this.state.contract} user={this.state.user} id={props.match.params.boardid} />)};
-    const UserPage = (props) =>{ return ( <Userpage  handleAccountChange={(a) => this.handleAccountChange(a)} user={this.state.user} />)};
+    const UserPage = (props) =>{ return ( <Userpage  contract={this.state.contract} handleAccountChange={(a) => this.handleAccountChange(a)} user={this.state.user} />)};
     const HomePage = (props) =>{ return ( <Homepage web3={this.state.web3} accounts={this.state.accounts} contract={this.state.contract} user={this.state.user} />)}
     return (
       <BrowserRouter> 
