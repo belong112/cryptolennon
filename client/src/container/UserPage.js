@@ -29,7 +29,7 @@ class Userpage extends Component {
       var array = []
       while(true){
         let x =  await contract.methods.get_all_replies(q_id, r_id).call()
-        if (x[0] == -1 && x[1] == -1)
+        if (x[0] === -1 && x[1] === -1)
           break
         let question = await contract.methods.get_question(x[0]).call()
         let reply = await contract.methods.get_reply(x[0], x[1]).call()
@@ -66,7 +66,7 @@ class Userpage extends Component {
         <div className="col-5 mx-auto">  
           <div className="form-group">
             <label for="exampleInputEmail1">你的暱稱</label>
-            <input className="form-control" value={this.state.name} onChange={this.namechange} maxlength="10"/>
+            <input className="form-control" value={this.state.name} onChange={this.namechange} maxLength="10"/>
           </div>          
           <button onClick={this.onSubmit} className="btn btn-outline-secondary">更新</button>
         </div>

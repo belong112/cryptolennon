@@ -11,6 +11,8 @@ import Homepage from "./container/Homepage.js"
 import Userpage from "./container/UserPage.js"
 import Registerpage from "./container/RegisterPage.js"
 
+import swal from 'sweetalert2'
+
 import "./App.css";
 
 class App extends Component {
@@ -99,7 +101,13 @@ class App extends Component {
         user: user
       })
     } catch(err){
-      console.log(err)
+      swal.fire({
+        icon: 'warning',
+        title: 'Oops...',
+        text: '尚未註冊喔！請先去註冊頁面註冊!',
+      });
+      console.log("There is an error while get_user:")
+      console.error(err)
     }
   }
 

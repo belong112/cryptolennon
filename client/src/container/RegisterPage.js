@@ -50,7 +50,7 @@ class Registerpage extends Component {
         <div className="col-5 mx-auto">  
           <div className="form-group">
             <label for="exampleInputEmail1">你的暱稱</label>
-            <input className="form-control" id="exampleInputEmail1" value={this.state.name} onChange={this.namechange} maxlength="10" required/>
+            <input className="form-control" id="exampleInputEmail1" value={this.state.name} onChange={this.namechange} maxLength="10" required/>
           </div>
           <label>你的生日</label>
           <div className="form-row">
