@@ -17,6 +17,7 @@ contract('Lennon', accounts => {
             console.log(ret[1])
             console.log(ret[2])
             console.log(ret[3])
+            console.log(ret[4])
         } )
         .then(() => lennon.get_account.call({from: accounts[1]}))
         .then( ret => {
@@ -24,6 +25,7 @@ contract('Lennon', accounts => {
             console.log(ret[1])
             console.log(ret[2])
             console.log(ret[3])
+            console.log(ret[4])
         } )
         .then(() => lennon.get_account.call({from: accounts[2]}))
         .then( ret => {
@@ -31,6 +33,7 @@ contract('Lennon', accounts => {
             console.log(ret[1])
             console.log(ret[2])
             console.log(ret[3])
+            console.log(ret[4])
         } )
     })
 
@@ -43,23 +46,71 @@ contract('Lennon', accounts => {
         .then(() => lennon.get_question(0))
         .then(ret => {
             console.log(ret[0])
+            console.log(ret[1])
+            console.log(ret[2])
+            console.log(ret[3])
         })
         .then(() => lennon.get_question(1))
         .then(ret => {
             console.log(ret[0])
+            console.log(ret[1])
+            console.log(ret[2])
+            console.log(ret[3])
         })
         .then(() => lennon.get_question(2))
         .then(ret => {
             console.log(ret[0])
+            console.log(ret[1])
+            console.log(ret[2])
+            console.log(ret[3])
+        })
+    })
+
+    it('should create(get) and sign prequestion correctly', () => {
+        return Lennon.deployed()
+        .then(() => lennon.create_prequestion('幹你娘?', 'test', 1, {from: accounts[0]}))
+        .then(() => lennon.create_prequestion('你好嗎?', 'iii', 4, {from: accounts[2]}))
+        .then(() => lennon.sign(0, {from: accounts[1]}))
+        .then(() => lennon.sign(0, {from: accounts[2]}))
+        .then(() => lennon.get_prequestion_length())
+        .then(ret => {
+            assert.equal(ret, 2)
+        })
+        .then(() => lennon.get_prequestion(0))
+        .then(ret => {
+            console.log(ret[0])
+            console.log(ret[1])
+            console.log(ret[2])
+            console.log(ret[3])
+            console.log(ret[4])
+        })
+        .then(() => lennon.get_prequestion(1))
+        .then(ret => {
+            console.log(ret[0])
+            console.log(ret[1])
+            console.log(ret[2])
+            console.log(ret[3])
+            console.log(ret[4])
         })
     })
 
     it('should create question correctly', () => {
         return Lennon.deployed()
-        .then(() => lennon.create_question('幹你娘?', {from: accounts[0]}))
+        .then(() => lennon.create_question(0, 5, {from: accounts[0]}))
+        .then(() => lennon.get_question_length())
+        .then(ret => {
+            assert.equal(ret, 4)
+        })
+        .then(() => lennon.get_prequestion_length())
+        .then(ret => {
+            assert.equal(ret, 1)
+        })
         .then(() => lennon.get_question(3))
         .then(ret => {
             console.log(ret[0])
+            console.log(ret[1])
+            console.log(ret[2])
+            console.log(ret[3])
         })
     })
 
@@ -120,6 +171,13 @@ contract('Lennon', accounts => {
             console.log(ret[2])
             console.log(ret[3])
             console.log(ret[4])
+        })
+        .then(() => lennon.get_question(0))
+        .then(ret => {
+            console.log(ret[0])
+            console.log(ret[1])
+            console.log(ret[2])
+            console.log(ret[3])
         })
     })
 
