@@ -215,6 +215,30 @@ contract Lennon is Ownable {
         return (r.reply, r.endorse, r.time, r.owner_id, r.likes.length);
     }
 
+    // get all question of an account
+    /*
+        Usage: For the first time call get get_all_questions(-1) and get x, the first question.
+               Then call get_all_questions(x) to get the next question iteratively until -1 returned.
+    */
+    function get_all_questions(int _q_id) external view needAccount returns(int) {
+        for(uint i = uint(_q_id + 1); i < Questions.length; i++){
+            if(Questions[i].owner_id == owner_to_id[msg.sender]) return int(i);
+        }
+        return -1;
+    }
+
+    // get all prequestion of an account
+    /*
+        Usage: For the first time call get get_all_prequestions(-1) and get x, the first prequestion.
+               Then call get_all_prequestions(x) to get the next prequestion iteratively until -1 returned.
+    */
+    function get_all_prequestions(int _p_id) external view needAccount returns(int) {
+        for(uint i = uint(_p_id + 1); i < PreQuestions.length; i++){
+            if(PreQuestions[i].owner_id == owner_to_id[msg.sender]) return int(i);
+        }
+        return -1;
+    }
+
     // get all replies of an account iteratively (_r_idx(th) reply to the question with id = _q_id)
     /*
         Usage:  For the first time call get_all_replies(-1,-1) and get (x, y), the first reply.
@@ -231,4 +255,5 @@ contract Lennon is Ownable {
         }
         return (-1, -1);
     }
+
 }

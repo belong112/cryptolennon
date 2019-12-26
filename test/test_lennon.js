@@ -182,10 +182,12 @@ contract('Lennon', accounts => {
     })
 
     /*
-        q0: 你支持反送中嗎?         r: 我支持港警(a2), 維尼尼瑪八七(a0)
-        q1: 你喜歡吃香菜嗎?         r: 支持香菜英文(a1)
-        q2: 2020。歸。投。韓下去?   r: 我是鋼鐵韓粉! 氣氣氣氣(a2)
-        q4: 幹你娘?                r: 
+        q0: 你支持反送中嗎?(admin)          r: 我支持港警(a2), 維尼尼瑪八七(a0)
+        q1: 你喜歡吃香菜嗎?(admin)          r: 支持香菜英文(a1)
+        q2: 2020。歸。投。韓下去?(admin)    r: 我是鋼鐵韓粉! 氣氣氣氣(a2)
+        q3: 幹你娘?(a0)                    r: 
+
+        p0: 你好嗎?(a2)
     */
 
     it('should like correctly', () => {
@@ -204,6 +206,38 @@ contract('Lennon', accounts => {
         .then(() => lennon.get_reply(1, 0))
         .then(ret => {
             assert.equal(ret[4], 0)
+        })
+    })
+
+    it('should get all questions of an account correctly', () => {
+        return Lennon.deployed()
+        .then(() => lennon.get_all_questions(-1, {from: accounts[0]}))
+        .then(ret => {
+            assert.equal(ret, 3)
+        })
+        .then(() => lennon.get_all_questions(4, {from: accounts[0]}))
+        .then(ret => {
+            assert.equal(ret, -1)
+        })
+        .then(() => lennon.get_all_questions(-1, {from: accounts[1]}))
+        .then(ret => {
+            assert.equal(ret, -1)
+        })
+    })
+
+    it('should get all prequestions of an account correctly', () => {
+        return Lennon.deployed()
+        .then(() => lennon.get_all_prequestions(-1, {from: accounts[0]}))
+        .then(ret => {
+            assert.equal(ret, -1)
+        })
+        .then(() => lennon.get_all_prequestions(-1, {from: accounts[2]}))
+        .then(ret => {
+            assert.equal(ret, 0)
+        })
+        .then(() => lennon.get_all_prequestions(0, {from: accounts[2]}))
+        .then(ret => {
+            assert.equal(ret, -1)
         })
     })
 
