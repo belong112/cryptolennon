@@ -3,7 +3,6 @@ import {NavLink, Link} from "react-router-dom";
 
 import test1 from "../img/tsai.jpg"
 
-let items = []
 class Homepage extends Component {
    constructor (props) {
     super(props);
@@ -15,6 +14,7 @@ class Homepage extends Component {
       textarea: "",
       subtitle: "",
       questions: [],
+      preQuestions: [],
       user: this.props.user
     }
   }
@@ -22,6 +22,7 @@ class Homepage extends Component {
   componentDidMount = async () => {
     const {contract} = this.state
     try {
+      // get question
       var l = await contract.methods.get_question_length().call()
 
       var temparray= []
@@ -32,14 +33,35 @@ class Homepage extends Component {
           id: i.toString(),
           genre: 'Life',
           title: temp[0].toString(),
-          subtitle: 'N/A',
-          num_comments: temp2
+          subtitle: temp[1].toString(),
+          num_comments: temp2,
+          last_update_time: temp[2],
+          owner_id: temp[3]
         }
         temparray.push(newitem)
       }
 
+      //get prequestion
+      l = await contract.methods.get_prequestion_length().call()
+
+      var temparray2= []
+      for (i = 0; i < l; i++) {
+        temp = await contract.methods.get_prequestion(i).call()
+        const newitem = {
+          id: i.toString(),
+          genre: 'Life',
+          title: temp[0].toString(),
+          subtitle: temp[1].toString(),
+          petitions: temp[4],
+          create_time: temp[2],
+          owner_id: temp[3]
+        }
+        temparray2.push(newitem)
+      }
+
       this.setState({
-        questions: temparray
+        questions: temparray,
+        preQuestions: temparray2
       })
 
     } catch (error) {
@@ -68,10 +90,21 @@ class Homepage extends Component {
     })
   }
 
+  handleSign = async (i) =>{
+    const { contract,accounts } = this.state
+    try{
+      await contract.methods.sign(i).send({from:accounts[0]})
+    }catch(err){
+      alert(err)
+    }
+  }
+
   onSubmit = async () => {
-    const {genre, textarea, subtitle, questions,contract,accounts} = this.state
+    const {genre, textarea, subtitle, preQuestions,contract,accounts} = this.state
     try { 
-      await contract.methods.create_question(textarea).send({from:accounts[0]})
+      var time = Date.now()
+      console.log(time)
+      await contract.methods.create_prequestion(textarea, subtitle, time).send({from:accounts[0]})
     }
     catch(err){
       console.log("There is an error while create_question:" + err);
@@ -82,23 +115,33 @@ class Homepage extends Component {
       return;
     }
 
-    var l = questions.length
-    var temparray = questions.concat()
+    var l = preQuestions.length
+    var temparray = preQuestions.concat()
     temparray.push({
       id: l,
       genre: 'Life',
       title: textarea,
-      subtitle: 'N/A',
-      num_comments: 0
+      subtitle: subtitle,
+      petitions: 1
     });
     this.setState({
       subtitle:"",
       textarea:"",
-      questions: temparray
+      preQuestions: temparray
     });
   }
 
   render() {
+    const preQuestionArray = this.state.preQuestions.map((item,index) =>{
+      return(
+        <div className="d-flex justify-content-between align-items-center list-group-item list-group-item-action">
+          {item.title}
+          <button className="btn btn-warning btn-sm" onClick={() => this.handleSign(index)}>
+            我要連署
+          </button>
+        </div>
+      )
+    })
     const questionArray = this.state.questions.map((item,index) =>{
       // var q = "["+(item.genre)+"] "+(item.title)
       return(
@@ -159,13 +202,29 @@ class Homepage extends Component {
             </div>
           </div>
         </div>
-        <div>
-          <div>
-            <h3>其他主題</h3>
-          </div>
-          <div className="list-group text-left">
-            {questionArray}
-          </div>        
+        <div>          
+          <nav>
+            <ul className="nav nav-tabs" id="myTab" role="tablist">
+              <li className="nav-item">
+                <a className="nav-link active" id="home-tab" data-toggle="tab" href="#all" role="tab">所有問題</a>
+              </li>
+              <li className="nav-item">
+                <a className="nav-link" id="profile-tab" data-toggle="tab" href="#petition" role="tab">連署中問題</a>
+              </li>
+            </ul>
+          </nav>
+          <div className="tab-content" id="myTabContent">
+            <div className="tab-pane fade show active" id="all" role="tabpanel" >
+              <div className="list-group text-left">
+                {questionArray}
+              </div>
+            </div>
+            <div className="tab-pane fade" id="petition" role="tabpanel">
+              <div className="list-group text-left">
+                {preQuestionArray}
+              </div> 
+            </div>
+          </div>  
         </div>
         <hr/>
         <div className='mt-5'>

@@ -132,31 +132,7 @@ class CommentBoard extends Component {
   }
 
   handleCommentRespond = async(r_id) => {
-    const {comments, contract, accounts, question} = this.state;
-    // const index = user.history.findIndex(item => item.id === id);
-    // const respondHistory = user.history[index];  //user's respond history 
-    
-    // const commentIdx = comments.findIndex(item => item.id === id);
-
-    // if (!respondHistory) {    // Not yet responded before
-    //   user.history.push({
-    //     id:id,
-    //     respond:respond,
-    //   });
-    //   comments[commentIdx].num_likes += 1;
-    // }
-    // else {
-    //   if (!respondHistory.respond) {   
-    //     respondHistory.respond = 'positive';
-    //     comments[commentIdx].num_likes += 1;
-    //   } else {       // 收回讚
-    //     respondHistory.respond = null;
-    //     comments[commentIdx].num_likes -= 1;
-    //   }
-
-    //   user.history.splice(index,1,respondHistory);
-    //}
-    
+    const {comments, contract, accounts, question} = this.state;    
     try{
       await contract.methods.like(question.q_id, r_id).send({from: accounts[0]})
       var new_comments = comments
