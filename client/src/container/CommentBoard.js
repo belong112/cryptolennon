@@ -93,7 +93,7 @@ class CommentBoard extends Component {
     })
   }
 
-  onSubmit = async () => {
+  onSubmitReply = async () => {
     const {question, comments, textarea, agree, contract, accounts} = this.state;
 
     if (textarea === ""){
@@ -103,6 +103,7 @@ class CommentBoard extends Component {
     } else {
       const time = getDateTime();
       console.log(time)
+      console.log(Date.now())
       var endorse = (agree === 'y' ? true : false)
       
       try{ 
@@ -119,14 +120,14 @@ class CommentBoard extends Component {
         comment:textarea,
         endorse:endorse,
         time: time,
-        owner_id: this.state.user.id, // 先寫死 之後要改
+        owner_id: this.state.user.id, 
         num_likes: 0,
       });
     }
     this.setState({
       agree: 'y',
       textarea:"",
-      comments: comments, //回復(data)
+      comments: comments, //回覆 (data)
       currentarray: comments //當前頁面上的回覆
     });
   }
@@ -193,7 +194,7 @@ class CommentBoard extends Component {
                <div className="form-group">
                 <textarea className="form-control" value={this.state.textarea} onChange={this.handleTxtOnchange} placeholder="寫些什麼..." rows="3"></textarea>
               </div>  
-              <button onClick={this.onSubmit} className="btn btn-primary">submit</button>          
+              <button onClick={this.onSubmitReply} className="btn btn-primary">submit</button>          
             </div>
           </div>
         </div>

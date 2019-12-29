@@ -29,8 +29,7 @@ class Userpage extends Component {
       var array = []
       while(true){
         let x =  await contract.methods.get_all_replies(q_id, r_id).call()
-        console.log(x)
-        if (x[0] === -1 && x[1] === -1)
+        if (x[0] === '-1' && x[1] === '-1')
           break
         let question = await contract.methods.get_question(x[0]).call()
         let reply = await contract.methods.get_reply(x[0], x[1]).call()

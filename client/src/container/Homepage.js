@@ -90,16 +90,24 @@ class Homepage extends Component {
     })
   }
 
+  // 連署
   handleSign = async (i) =>{
     const { contract,accounts } = this.state
     try{
       await contract.methods.sign(i).send({from:accounts[0]})
+
+      // check if 3 signs, if true => make question
+      const temp = await contract.methods.get_prequestion(i).call()
+      console.log(temp)
+      if(temp[4] === 3){
+        await contract.methods.create_question(i, Date.now()).send()
+      }
     }catch(err){
       alert(err)
     }
   }
 
-  onSubmit = async () => {
+  onSubmitPrequestion = async () => {
     const {genre, textarea, subtitle, preQuestions,contract,accounts} = this.state
     try { 
       var time = Date.now()
@@ -174,7 +182,8 @@ class Homepage extends Component {
             <div className="col-md-6 px-0 text-left">
               <p className="lead my-3">發燒話題</p>
               <h4 className='text-danger'>Life</h4>
-              <h1 className="display-4 ">{sortarray[0].title}</h1>         
+              <h1 className="display-4 ">{sortarray[0].title}</h1>
+              <h4 className="">{sortarray[0].subtitle}</h4>         
               <p className="lead mb-0"><NavLink className="text-white font-weight-bold" to={"/commentboard/"+(sortarray[0].id)}>進入討論區</NavLink></p>
             </div> 
           </div>
@@ -245,8 +254,8 @@ class Homepage extends Component {
             <label>副標題</label>
             <input type="text" className="form-control"  onChange={this.handleSubOnchange} value={this.state.subtitle} />
           </div>  
-          <p className='text-danger'>註 : 此動作需要約0.3eth</p>
-          <button onClick={this.onSubmit} className="btn btn-primary">送出</button> 
+          <p className='text-danger'>註 : 此動作需要約0.003eth</p>
+          <button onClick={this.onSubmitPrequestion} className="btn btn-primary">送出</button> 
         </div>
       </div>
     </div>
