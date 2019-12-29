@@ -63,7 +63,7 @@ contract Lennon is Ownable {
 
         Questions.push(Question("你支持反送中嗎?", "暴政，暴民?", 0, 0, new uint[](0)));
         Questions.push(Question("你喜歡吃香菜嗎?", "真香", 1, 0, new uint[](0)));
-        Questions.push(Question("2020。歸。投。韓下去?", "1/11記得投票", 2, 0, new uint[](0)));
+        Questions.push(Question("2020。歸。投。韓下去?", "1/11記得投票", 3, 0, new uint[](0)));
 
         /*
         Accounts.push(Account("鄭禕仁", 1, 2, 1987));
