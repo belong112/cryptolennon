@@ -15,6 +15,9 @@ import swal from 'sweetalert2'
 
 import "./App.css";
 
+import { ipfs } from "./utils/ipfs.js"
+import SelectInput from "@material-ui/core/Select/SelectInput";
+
 class App extends Component {
    constructor (props) {
     super(props);
@@ -50,7 +53,7 @@ class App extends Component {
 
       // Set web3, accounts, and contract to the state, and then proceed with an
       // example of interacting with the contract's methods.
-      this.setState({ web3, accounts, contract: instance},this.getUser);
+      this.setState({ web3, accounts, contract: instance},this.runExample);
     } catch (error) {
       // Catch any errors for any of the above operations.
       alert(
@@ -62,6 +65,13 @@ class App extends Component {
 
   runExample = async () => {
     const { accounts, contract } = this.state;
+    await ipfs.setUp();
+    await ipfs.addFile('ivan.txt','ivan is me!');
+    
+    
+
+    await ipfs.getFile();
+
     //await contract.methods.create_account("雨境",5,27,1998).send({from: accounts[0]});
 
     // await contract.methods.create_question().send({from: accounts[0]});
