@@ -4,7 +4,7 @@ var ipfs = {
     ipfs_node: null,
     posts:[
         {
-            image_hash:'QmPV2smUoQZEfWXpeXmxjhr2uS6xicdm9Hkk4fv6gXG5ep'
+            image_hash:'QmRf22bZar3WKmojipms22PkXH1MZGmvsqzQtuSvQE3uhm'
         }
     ],
 
@@ -24,19 +24,19 @@ var ipfs = {
 
     async addFile(path,content) {
         const filesAdded = await this.ipfs_node.add({
-            path: 'ivan.txt',
-            content: 'ivan 102'
+            path: path,
+            content: content
         })
         
         console.log('Added file Succeed ! Path:', filesAdded[0].path, filesAdded[0].hash)
         this.posts.push({
-            image_haseh:filesAdded[0].hash
+            image_hash:filesAdded[0].hash
         });
     },
 
     async getFile() {
         const post = (await this.ipfs_node.cat(this.posts[0].image_hash)).toString();
-        console.log(post);
+        console.log('post: ',post);
     }
 
 }

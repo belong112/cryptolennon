@@ -15,7 +15,10 @@ class Homepage extends Component {
       subtitle: "",
       questions: [],
       preQuestions: [],
-      user: this.props.user
+      user: this.props.user,
+      file: null,
+      buffer: null,
+      ipfsHash: null
     }
   }
 
@@ -73,20 +76,34 @@ class Homepage extends Component {
   };
 
 
-   handleTxtOnchange = (e) =>{
-    this.setState({
-      textarea: e.target.value
-    })
-  }
+  handleTxtOnchange = (e) => {this.setState({textarea: e.target.value})}
+  handleSubOnchange = (e) => {this.setState({subtitle: e.target.value})}
+  handleSelecctOnchange = (e) => {this.setState({genre: e.target.value})}
+  handleChangeFile = (e) => {
+    e.preventDefault()
+    let reader = new FileReader();
+    reader.readAsArrayBuffer(e.target.files[0]);
+    reader.onloadend = () => {
+      this.setState({
+        buffer: Buffer(reader.result)
+      });
+      console.log(reader.result)
+    };
+  };
 
-  handleSubOnchange = (e) =>{
-    this.setState({
-      subtitle: e.target.value
-    })
-  }
-  handleSelecctOnchange = (e) =>{
-    this.setState({
-      genre: e.target.value
+  onSubmit = async (e) => {
+    e.preventDefault()
+    // const IPFS = require('ipfs');
+    // const ipfs = await IPFS.create(); 
+    const IPFS = require('ipfs-api');
+    const ipfs = new IPFS({ host: 'ipfs.infura.io', port: 5001, protocol: 'https' });
+    ipfs.files.add(this.state.buffer, (error, result) => {
+      if(error) {
+        console.error(error)
+        return
+      }
+      console.log('hash ',result[0].hash)
+      this.setState({ ipfsHash: result[0].hash })
     })
   }
 
@@ -253,7 +270,13 @@ class Homepage extends Component {
           <div className="form-group">
             <label>副標題</label>
             <input type="text" className="form-control"  onChange={this.handleSubOnchange} value={this.state.subtitle} />
-          </div>  
+          </div>
+          <div className="form-group">
+            <label>上傳圖片</label>
+            <br/>
+            <input type="file" className="" onChange={this.handleChangeFile} />
+          </div>
+          <img src={`https://ipfs.io/ipfs/${this.state.ipfsHash}`} alt="load_image" />
           <p className='text-danger'>註 : 此動作需要約0.003eth</p>
           <button onClick={this.onSubmitPrequestion} className="btn btn-primary">送出</button> 
         </div>
