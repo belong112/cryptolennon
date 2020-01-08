@@ -65,12 +65,12 @@ class App extends Component {
 
   runExample = async () => {
     const { accounts, contract } = this.state;
-    await ipfs.setUp();
-    await ipfs.addFile('ivan.txt','ivan is me!');
+    // await ipfs.setUp();
+    // await ipfs.addFile('ivan.txt','ivan is me!');
     
     
 
-    await ipfs.getFile();
+    // await ipfs.getFile();
 
     //await contract.methods.create_account("雨境",5,27,1998).send({from: accounts[0]});
 
