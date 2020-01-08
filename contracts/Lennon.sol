@@ -4,9 +4,9 @@ import "./Ownable.sol";
 
 contract Lennon is Ownable {
 
-    event newPreQuestion(uint prequestion_id, string question, string subtitle, uint time, uint owner_id);
+    event newPreQuestion(uint prequestion_id, string question, string subtitle, string picture_ipfs, uint time, uint owner_id);
     event signed(uint prequestion_id, uint owner_id);
-    event newQuestion(uint question_id, string question, string subtitle, uint time, uint owner_id);
+    event newQuestion(uint question_id, string question, string subtitle, string picture_ipfs, uint time, uint owner_id);
     event newAccount(uint id, string name, uint birth_day, uint birth_month, uint birth_year);
     event newReply(uint question_id, uint reply_id, string reply, bool endorse, uint time, uint owner_id);
     event liked(uint question_id, uint reply_id, uint owner_id);
@@ -30,6 +30,7 @@ contract Lennon is Ownable {
     struct Question {
         string question;
         string subtitle;
+        string picture_ipfs;
         uint time;
         uint owner_id;
         uint[] replies;
@@ -38,6 +39,7 @@ contract Lennon is Ownable {
     struct PreQuestion {
         string question;
         string subtitle;
+        string picture_ipfs;
         uint time;
         uint owner_id;
         uint[] petitions;
@@ -90,11 +92,6 @@ contract Lennon is Ownable {
         */
     }
 
-    // only owner of the contract can create a question
-    // function create_question(string memory _q, string memory _s) public {
-    //     Questions.push(Question(_q, _s, 0, new uint[](0)));
-    // }
-
     // modify petition_threshold (only owner of the contract)
     function modify_petition_threshold(uint _t) public onlyOwner {
         petition_threshold = _t;
@@ -114,10 +111,10 @@ contract Lennon is Ownable {
     }
 
     // create a preQuestion waiting for petitions
-    function create_prequestion(string memory _p, string memory _s, uint _t) public needAccount {
-        PreQuestions.push(PreQuestion(_p, _s, _t, owner_to_id[msg.sender], new uint[](0)));
+    function create_prequestion(string memory _p, string memory _s, string memory _pic, uint _t) public needAccount {
+        PreQuestions.push(PreQuestion(_p, _s, _pic, _t, owner_to_id[msg.sender], new uint[](0)));
         uint p_id = PreQuestions[PreQuestions.length-1].petitions.push(owner_to_id[msg.sender]);
-        emit newPreQuestion(p_id, _p, _s, _t, owner_to_id[msg.sender]);
+        emit newPreQuestion(p_id, _p, _s, _pic, _t, owner_to_id[msg.sender]);
     }
 
     // sign a preQuestion
@@ -139,10 +136,10 @@ contract Lennon is Ownable {
         PreQuestion memory p = PreQuestions[_p_id];
         require(owner_to_id[msg.sender] == p.owner_id, "Can only turn oneself's prequestion into a question");
         require(p.petitions.length >= petition_threshold, "Not enough people signed the question");
-        uint id = Questions.push(Question(p.question, p.subtitle, _t, p.owner_id, new uint[](0)));
+        uint id = Questions.push(Question(p.question, p.subtitle, p.picture_ipfs, _t, p.owner_id, new uint[](0)));
         PreQuestions[_p_id] = PreQuestions[PreQuestions.length-1];
         PreQuestions.length--;
-        emit newQuestion(id, p.question, p.subtitle, _t, p.owner_id);
+        emit newQuestion(id, p.question, p.subtitle, p.picture_ipfs, _t, p.owner_id);
     }
 
     // create a reply of a question
@@ -186,10 +183,10 @@ contract Lennon is Ownable {
         return PreQuestions.length;
     }
 
-    // get prequestion given prequestionId (question, subtitle, create_time, owner_id, # sign)
-    function get_prequestion(uint _p_id) external view returns(string memory, string memory, uint, uint, uint) {
+    // get prequestion given prequestionId (question, subtitle, picture_ipfs, create_time, owner_id, # sign)
+    function get_prequestion(uint _p_id) external view returns(string memory, string memory, string memory, uint, uint, uint) {
         PreQuestion memory p = PreQuestions[_p_id];
-        return (p.question, p.subtitle, p.time, p.owner_id, p.petitions.length);
+        return (p.question, p.subtitle, p.picture_ipfs, p.time, p.owner_id, p.petitions.length);
     }
 
     // get total number of questions
@@ -197,11 +194,11 @@ contract Lennon is Ownable {
         return Questions.length;
     }
 
-    // get question given questionId (question, subtitle, last_update_time, owner_id)
-    function get_question(uint _q_id) external view returns(string memory, string memory, uint, uint) {
+    // get question given questionId (question, subtitle, picture_ipfs, last_update_time, owner_id)
+    function get_question(uint _q_id) external view returns(string memory, string memory, string memory, uint, uint) {
         Question memory q = Questions[_q_id];
-        if( q.replies.length == 0 ) return (q.question, q.subtitle, q.time, q.owner_id);
-        return (q.question, q.subtitle, Replies[q.replies[q.replies.length - 1]].time, q.owner_id);
+        if( q.replies.length == 0 ) return (q.question, q.subtitle, q.picture_ipfs, q.time, q.owner_id);
+        return (q.question, q.subtitle, q.picture_ipfs, Replies[q.replies[q.replies.length - 1]].time, q.owner_id);
     }
 
     // get total number of replies to a question
