@@ -15,7 +15,7 @@ import swal from 'sweetalert2'
 
 import "./App.css";
 
-import { ipfs } from "./utils/ipfs.js"
+// import { ipfs } from "./utils/ipfs.js"
 import SelectInput from "@material-ui/core/Select/SelectInput";
 
 class App extends Component {
@@ -65,12 +65,12 @@ class App extends Component {
 
   runExample = async () => {
     const { accounts, contract } = this.state;
-    await ipfs.setUp();
-    await ipfs.addFile('ivan.txt','ivan is me!');
+    // await ipfs.setUp();
+    // await ipfs.addFile('ivan.txt','ivan is me!');
     
     
 
-    await ipfs.getFile();
+    // await ipfs.getFile();
 
     //await contract.methods.create_account("雨境",5,27,1998).send({from: accounts[0]});
 
@@ -97,9 +97,9 @@ class App extends Component {
   }
 
   getUser = async () =>{
-    const { contract } = this.state;
+    const { accounts, contract } = this.state;
     try{
-      const temp = await contract.methods.get_account().call();
+      const temp = await contract.methods.get_account().call({'from': accounts[0]});
       var user = {
         name: temp[1],
         b_year: temp[4],
@@ -125,7 +125,7 @@ class App extends Component {
     const {contract, accounts} = this.state
     try { 
       await contract.methods.create_account(a,b,c,d).send({'from': accounts[0]});
-      const t3 = await contract.methods.get_account().call();
+      const t3 = await contract.methods.get_account().call({'from': accounts[0]});
       var fake_user = {
         id: t3[0],
         name:a,
