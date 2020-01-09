@@ -99,12 +99,7 @@ class App extends Component {
   getUser = async () =>{
     const { accounts, contract } = this.state;
     try{
-<<<<<<< HEAD
       const temp = await contract.methods.get_account().call({'from': accounts[0]});
-=======
-      const temp = await contract.methods.get_account().call();
-      console.log(temp)
->>>>>>> 59fa2e772b16f1aa379ee292736d4dab75735c34
       var user = {
         name: temp[1],
         b_year: temp[4],
