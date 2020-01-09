@@ -23,12 +23,12 @@ class Userpage extends Component {
 
   componentDidMount = async () =>{
     try{
-      const {contract} = this.state
+      const {accounts, contract} = this.state
       var q_id = -1
       var r_id = -1
       var array = []
       while(true){
-        let x =  await contract.methods.get_all_replies(q_id, r_id).call()
+        let x =  await contract.methods.get_all_replies(q_id, r_id).call({'from': accounts[0]})
         if (x[0] === '-1' && x[1] === '-1')
           break
         let question = await contract.methods.get_question(x[0]).call()
