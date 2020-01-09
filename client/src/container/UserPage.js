@@ -6,7 +6,9 @@ class Userpage extends Component {
     this.state = {       
       contract: this.props.contract,
       name: this.props.user.name,
-      all_array: []
+      replies: [],
+      prequestions: [],
+      petition_threshld: 0
     };
   }
 
@@ -26,19 +28,32 @@ class Userpage extends Component {
       const {accounts, contract} = this.state
       var q_id = -1
       var r_id = -1
-      var array = []
+      var array0 = []
+      var p_id = -1
+      var array1 = []
       while(true){
         let x =  await contract.methods.get_all_replies(q_id, r_id).call({'from': accounts[0]})
         if (x[0] === '-1' && x[1] === '-1')
           break
         let question = await contract.methods.get_question(x[0]).call()
         let reply = await contract.methods.get_reply(x[0], x[1]).call()
-        array.push({q:question[0], r:reply[0], time:reply[2]})
+        array0.push({q:question[0], r:reply[0], time:reply[2]})
         q_id = x[0]
         r_id = x[1]     
       }
+      while(true){
+        let x = await contract.methods.get_all_prequestions(p_id).call({'from': accounts[0]})
+        if (x === '-1')
+          break
+        let prequestion = await contract.methods.get_prequestion(x).call()
+        array1.push({p:prequestion[0], n_sign:prequestion[5]})
+        p_id = x
+      }
+      let t = await contract.methods.get_petition_threshold().call()
       this.setState({
-        all_array: array
+        replies: array0,
+        prequestions: array1,
+        petitions: t
       })
     }catch(err){
       console.log('error')
@@ -46,7 +61,7 @@ class Userpage extends Component {
   }
 
   render() {
-    var temp = this.state.all_array.concat().sort((a, b) => (b.time) - (a.time));
+    var temp = this.state.replies.concat().sort((a, b) => (b.time) - (a.time));
     const comments = temp.map(item => {
       return(
         <Fragment>
