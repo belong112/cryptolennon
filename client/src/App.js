@@ -53,7 +53,7 @@ class App extends Component {
 
       // Set web3, accounts, and contract to the state, and then proceed with an
       // example of interacting with the contract's methods.
-      this.setState({ web3, accounts, contract: instance},this.runExample);
+      this.setState({ web3, accounts, contract: instance},this.getUser);
     } catch (error) {
       // Catch any errors for any of the above operations.
       alert(
@@ -99,7 +99,12 @@ class App extends Component {
   getUser = async () =>{
     const { accounts, contract } = this.state;
     try{
+<<<<<<< HEAD
       const temp = await contract.methods.get_account().call({'from': accounts[0]});
+=======
+      const temp = await contract.methods.get_account().call();
+      console.log(temp)
+>>>>>>> 59fa2e772b16f1aa379ee292736d4dab75735c34
       var user = {
         name: temp[1],
         b_year: temp[4],

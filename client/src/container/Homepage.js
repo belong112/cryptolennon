@@ -3,6 +3,8 @@ import {NavLink, Link} from "react-router-dom";
 
 import test1 from "../img/tsai.jpg"
 
+import swal from 'sweetalert2'
+
 class Homepage extends Component {
    constructor (props) {
     super(props);
@@ -16,7 +18,6 @@ class Homepage extends Component {
       questions: [],
       preQuestions: [],
       user: this.props.user,
-      file: null,
       buffer: null,
       ipfsHash: null
     }
@@ -37,9 +38,10 @@ class Homepage extends Component {
           genre: 'Life',
           title: temp[0].toString(),
           subtitle: temp[1].toString(),
+          imghash: temp[2].toString(),
           num_comments: temp2,
-          last_update_time: temp[2],
-          owner_id: temp[3]
+          last_update_time: temp[3],
+          owner_id: temp[4]
         }
         temparray.push(newitem)
       }
@@ -55,9 +57,10 @@ class Homepage extends Component {
           genre: 'Life',
           title: temp[0].toString(),
           subtitle: temp[1].toString(),
-          petitions: temp[4],
-          create_time: temp[2],
-          owner_id: temp[3]
+          imghash: temp[2].toString(),
+          petitions: temp[5],
+          create_time: temp[4],
+          owner_id: temp[4]
         }
         temparray2.push(newitem)
       }
@@ -87,25 +90,8 @@ class Homepage extends Component {
       this.setState({
         buffer: Buffer(reader.result)
       });
-      console.log(reader.result)
     };
   };
-
-  onSubmit = async (e) => {
-    e.preventDefault()
-    // const IPFS = require('ipfs');
-    // const ipfs = await IPFS.create(); 
-    const IPFS = require('ipfs-api');
-    const ipfs = new IPFS({ host: 'ipfs.infura.io', port: 5001, protocol: 'https' });
-    ipfs.files.add(this.state.buffer, (error, result) => {
-      if(error) {
-        console.error(error)
-        return
-      }
-      console.log('hash ',result[0].hash)
-      this.setState({ ipfsHash: result[0].hash })
-    })
-  }
 
   // 連署
   handleSign = async (i) =>{
@@ -124,12 +110,41 @@ class Homepage extends Component {
     }
   }
 
-  onSubmitPrequestion = async () => {
+  // 提交待聯署問題
+  onSubmitPrequestion = async (e) => {
+    e.preventDefault()
     const {genre, textarea, subtitle, preQuestions,contract,accounts} = this.state
+    let hash = 'QmbFwy'
     try { 
-      var time = Date.now()
-      console.log(time)
-      await contract.methods.create_prequestion(textarea, subtitle, time).send({from:accounts[0]})
+      // send picture ipfs
+      const IPFS = require('ipfs-api');
+      const ipfs = new IPFS({ host: 'ipfs.infura.io', port: 5001, protocol: 'https' });
+      console.log('reading')
+
+      // Error Handle. Photo upload (Required)
+      if (!this.state.buffer) {
+        swal.fire({
+          icon: 'warning',
+          title: 'Oops...',
+          text: '你還沒上傳照片啦，你是要別人看什麼＾＿＾？',
+        });
+        return;
+      }
+
+      await ipfs.files.add(this.state.buffer, async (error, result) => {
+        if(error) {
+          console.error(error)
+          return
+        }
+        hash = result[0].hash 
+        console.log('hash ',hash)
+        var time = Date.now()
+        console.log(time)
+        await contract.methods.create_prequestion(textarea, subtitle, hash, time).send({from:accounts[0]})
+      })
+      // var time = Date.now()
+      // console.log(time)
+      // await contract.methods.create_prequestion(textarea, subtitle, hash, time).send({from:accounts[0]})
     }
     catch(err){
       console.log("There is an error while create_question:" + err);
@@ -147,6 +162,7 @@ class Homepage extends Component {
       genre: 'Life',
       title: textarea,
       subtitle: subtitle,
+      imghash: hash,
       petitions: 1
     });
     this.setState({
@@ -159,7 +175,7 @@ class Homepage extends Component {
   render() {
     const preQuestionArray = this.state.preQuestions.map((item,index) =>{
       return(
-        <div className="d-flex justify-content-between align-items-center list-group-item list-group-item-action">
+        <div className="d-flex justify-content-between align-items-center list-group-item list-group-item-action" onClick={()=>alert(item.imghash)}>
           {item.title}
           <button className="btn btn-warning btn-sm" onClick={() => this.handleSign(index)}>
             我要連署
@@ -184,8 +200,8 @@ class Homepage extends Component {
 
     var sectionStyle = {
       width: "100%",
-      backgroundImage: `url(${test1})`,
-      backgroundPosition: "center 90%", 
+      backgroundImage:'url(https://i.imgur.com/G4EqeWr.jpg)',
+      backgroundPosition: "center 20%", 
       backgroundSize:"100%",
     };
     if(raedy)
@@ -276,7 +292,7 @@ class Homepage extends Component {
             <br/>
             <input type="file" className="" onChange={this.handleChangeFile} />
           </div>
-          <img src={`https://ipfs.io/ipfs/${this.state.ipfsHash}`} alt="load_image" />
+          <img src= { `https://ipfs.io/ipfs/QmbFwywTUQ5NPxeW2KwftL59FQ7UQFRuw31EYqFUWpBNot` } alt="no_image" />
           <p className='text-danger'>註 : 此動作需要約0.003eth</p>
           <button onClick={this.onSubmitPrequestion} className="btn btn-primary">送出</button> 
         </div>
