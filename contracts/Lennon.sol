@@ -189,6 +189,11 @@ contract Lennon is Ownable {
         return (p.question, p.subtitle, p.picture_ipfs, p.time, p.owner_id, p.petitions.length);
     }
 
+    // get petition threshold for changing a question into a prequestion
+    function get_petition_threshold() external view returns(uint) {
+        return petition_threshold;
+    }
+
     // get total number of questions
     function get_question_length() external view returns(uint) {
         return Questions.length;
