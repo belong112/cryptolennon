@@ -3,6 +3,8 @@ import {NavLink, Link} from "react-router-dom";
 
 import test1 from "../img/tsai.jpg"
 
+import swal from 'sweetalert2'
+
 class Homepage extends Component {
    constructor (props) {
     super(props);
@@ -117,7 +119,18 @@ class Homepage extends Component {
       // send picture ipfs
       const IPFS = require('ipfs-api');
       const ipfs = new IPFS({ host: 'ipfs.infura.io', port: 5001, protocol: 'https' });
-      console.log('raeding')
+      console.log('reading')
+
+      // Error Handle. Photo upload (Required)
+      if (!this.state.buffer) {
+        swal.fire({
+          icon: 'warning',
+          title: 'Oops...',
+          text: '你還沒上傳照片啦，你是要別人看什麼＾＿＾？',
+        });
+        return;
+      }
+
       await ipfs.files.add(this.state.buffer, async (error, result) => {
         if(error) {
           console.error(error)
