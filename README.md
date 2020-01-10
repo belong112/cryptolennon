@@ -10,6 +10,7 @@
     cd client/
     npm install
     ```
+
 2. Prepare environment
     ```
     Create a workspace of private chain with quick start in ganache.
@@ -22,8 +23,10 @@
     truffle compile
     truffle migrate
     ```
+
 4. Run
     ```
     npm run start
     ```
+    
 5. A React App would be opened in browser. You can use the cryptoLennon finally.
