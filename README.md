@@ -6,7 +6,7 @@
 ## Installation
 
 1. Install packages
-    ```s
+    ```
     cd client/
     npm install
     ```
@@ -18,12 +18,12 @@
     ```
 
 3. Migrate the code
-    ```s
+    ```
     truffle compile
     truffle migrate
     ```
 4. Run
-    ```s
+    ```
     npm run start
     ```
 5. A React App would be opened in browser. You can use the cryptoLennon finally.
