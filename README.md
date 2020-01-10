@@ -6,7 +6,7 @@
 ## Installation
 
 1. Install packages
-    ```js
+    ```s
     cd client/
     npm install
     ```
