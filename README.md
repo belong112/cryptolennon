@@ -11,17 +11,19 @@
     npm install
     ```
 2. Prepare environment
+    ```
     Create a workspace of private chain with quick start in ganache.
     Connect it with metamask account.
     Modify ../truffle-box.json to the right port corresponding to the block chain.
+    ```
 
 3. Migrate the code
-    ```js
+    ```s
     truffle compile
     truffle migrate
     ```
 4. Run
-    ```js
+    ```s
     npm run start
     ```
 5. A React App would be opened in browser. You can use the cryptoLennon finally.
