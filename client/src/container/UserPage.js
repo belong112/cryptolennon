@@ -10,6 +10,7 @@ class Userpage extends Component {
       contract: this.props.contract,
       name: this.props.user.name,
       replies: [],
+      questions: [],
       preQuestions: [],
       petitionThreshold: 0
     };
@@ -34,6 +35,7 @@ class Userpage extends Component {
       var array0 = []
       var p_id = -1
       var array1 = []
+      var array2 = []
       //get replies
       while(true){
         let x =  await contract.methods.get_all_replies(q_id, r_id).call({'from': accounts[0]})
@@ -55,12 +57,35 @@ class Userpage extends Component {
         array1.push({title:prequestion[0], n_sign:prequestion[5], p_id: x}) //Todo: n_sign->petition
         p_id = x
       }
+      //get questions
+      p_id = -1
+      while(true){
+        let x = await contract.methods.get_all_questions(p_id).call({'from': accounts[0]})
+        if (x === '-1')
+          break
+        let question = await contract.methods.get_question(x).call()
+        array2.push({title:question[0]}) //Todo: n_sign->petition
+        p_id = x
+      }
+      //get theeshold
       let t = await contract.methods.get_petition_threshold().call()
       this.setState({
         replies: array0,
+        questions: array2,
         preQuestions: array1,
         petitionThreshold: t
       })
+
+      //get questions
+      while(true){
+        let x = await contract.methods.get_all_prequestions(p_id).call({'from': accounts[0]})
+        console.log('x ', x)
+        if (x === '-1')
+          break
+        let prequestion = await contract.methods.get_prequestion(x).call()
+        array1.push({title:prequestion[0], n_sign:prequestion[5], p_id: x}) //Todo: n_sign->petition
+        p_id = x
+      }
     }catch(err){
       console.log('error')
     }
@@ -95,7 +120,8 @@ class Userpage extends Component {
 
   render() {
     var comments = this.state.replies.concat().sort((a, b) => (b.time) - (a.time));
-    var prequestions = this.state.prequestions.concat();
+    var preQuestions = this.state.preQuestions.concat();
+    var questions = this.state.questions.concat();
     const c = comments.map(item => {
       return(
         <Fragment>
@@ -119,6 +145,15 @@ class Userpage extends Component {
         </div>
       )
     })
+
+    const q = questions.map((item, index) => {
+      return(
+        <div className={"d-flex justify-content-between align-items-center list-group-item "}>
+          {item.title}
+        </div>
+      )
+    })
+
     return (
       <div className="container">
         <div className="py-5 text-center">          
@@ -132,11 +167,32 @@ class Userpage extends Component {
           </div>          
           <button onClick={this.onSubmit} className="btn btn-outline-secondary">更新</button>
         </div>
-        
-        <div className='my-5'>
-          <h4>連署中問題</h4>
-          {preQ}
+
+        <div className='my-5'>          
+          <nav>
+            <ul className="nav nav-tabs" id="myTab" role="tablist">
+              <li className="nav-item">
+                <a className="nav-link active" id="home-tab" data-toggle="tab" href="#all" role="tab">已發布問題</a>
+              </li>
+              <li className="nav-item">
+                <a className="nav-link" id="profile-tab" data-toggle="tab" href="#petition" role="tab">連署中問題</a>
+              </li>
+            </ul>
+          </nav>
+          <div className="tab-content" id="myTabContent">
+            <div className="tab-pane fade show active" id="all" role="tabpanel" >
+              <div className="list-group text-left">
+                {q}
+              </div>
+            </div>
+            <div className="tab-pane fade" id="petition" role="tabpanel">
+              <div className="list-group text-left">
+                {preQ}
+              </div> 
+            </div>
+          </div>  
         </div>
+
         <div className="my-5">
           <h4>歷史紀錄</h4>
           <div className="table-wrapper-scroll-y">

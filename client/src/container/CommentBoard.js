@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 
 import PostIt from "../components/PostIt.js";
+import swal from 'sweetalert2';
 
 import {getDateTime} from "../utils/utils.js";
 
@@ -98,9 +99,17 @@ class CommentBoard extends Component {
     const {question, comments, textarea, agree, contract, accounts} = this.state;
 
     if (textarea === ""){
-      alert("你還沒寫下意見")
+      swal.fire({
+        icon: 'warning',
+        title: 'Oops...',
+        text: '你還沒寫下意見',
+      });
     } else if (agree === null) {
-      alert('你還沒選擇支持或反對')
+      swal.fire({
+        icon: 'warning',
+        title: 'Oops...',
+        text: '你還沒選擇支持或反對',
+      });
     } else {
       const time = Date.now();
       console.log(time)
@@ -140,7 +149,11 @@ class CommentBoard extends Component {
       var new_comments = comments
       new_comments[r_id].num_likes+=1
     } catch(err){
-      alert(err)
+      swal.fire({
+        icon: 'warning',
+        title: 'Oops...',
+        text: '按了讚是不能收回的喔<3',
+      });
     }
     this.setState({
       //user:user,

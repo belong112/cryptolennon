@@ -198,7 +198,8 @@ class Homepage extends Component {
         </div>
       ) 
     })
-    const questionArray = this.state.questions.map((item,index) =>{
+    const sortedQuestionArray = this.state.questions.concat().sort((b,a) =>(a.num_comments - b.num_comments));
+    const questionArray = sortedQuestionArray.map((item,index) =>{
       // var q = "["+(item.genre)+"] "+(item.title)
       return(
         <Link to={"/commentboard/"+(index)} className="d-flex justify-content-between align-items-center list-group-item list-group-item-action">{item.title}<span className={"badge badge-pill "+(item.num_comments > 10 ? 'badge-danger':'badge-secondary')}>{item.num_comments}</span></Link>
