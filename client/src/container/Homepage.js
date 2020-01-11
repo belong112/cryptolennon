@@ -47,7 +47,7 @@ class Homepage extends Component {
       }
 
       //get prequestion
-      l = await contract.methods.get_prequestion_length().call()
+      l = await contract.methods.get_prequestion_length().call();
 
       var temparray2= []
       for (i = 0; i < l; i++) {
@@ -95,19 +95,28 @@ class Homepage extends Component {
 
   // 連署
   handleSign = async (i) =>{
-    const { contract,accounts } = this.state
+    const { contract,accounts } = this.state;
     try{
-      await contract.methods.sign(i).send({from:accounts[0]})
+      await contract.methods.sign(i).send({from:accounts[0]});
 
       // check if 3 signs, if true => make question
-      const temp = await contract.methods.get_prequestion(i).call()
-      console.log(temp)
-      if(temp[4] === 3){
-        await contract.methods.create_question(i, Date.now()).send()
+      const prequestion = await contract.methods.get_prequestion(i).call();
+      if(prequestion[5] >= 3){
+        await this.petitionComplete(i);
       }
     }catch(err){
-      alert(err)
+      swal.fire({
+        icon: 'warning',
+        title: 'Oops...',
+        text: '連署錯誤了啦！你是不是要自肥啊？',
+      });
     }
+  }
+
+  petitionComplete = (i) => {
+    const { contract,accounts } = this.state;
+    
+    //Todo: 顯示連署成功
   }
 
   // 提交待聯署問題
@@ -119,7 +128,6 @@ class Homepage extends Component {
       // send picture ipfs
       const IPFS = require('ipfs-api');
       const ipfs = new IPFS({ host: 'ipfs.infura.io', port: 5001, protocol: 'https' });
-      console.log('reading')
 
       // Error Handle. Photo upload (Required)
       if (!this.state.buffer) {
@@ -155,8 +163,8 @@ class Homepage extends Component {
       return;
     }
 
-    var l = preQuestions.length
-    var temparray = preQuestions.concat()
+    var l = preQuestions.length;
+    var temparray = preQuestions.concat();
     temparray.push({
       id: l,
       genre: 'Life',
@@ -168,20 +176,21 @@ class Homepage extends Component {
     this.setState({
       subtitle:"",
       textarea:"",
-      preQuestions: temparray
+      preQuestions: temparray,
     });
   }
 
   render() {
+    const { contract, accounts } = this.state;
     const preQuestionArray = this.state.preQuestions.map((item,index) =>{
       return(
-        <div className="d-flex justify-content-between align-items-center list-group-item list-group-item-action" onClick={()=>alert(item.imghash)}>
+        <div className="d-flex justify-content-between align-items-center list-group-item list-group-item-action">
           {item.title}
           <button className="btn btn-warning btn-sm" onClick={() => this.handleSign(index)}>
-            我要連署
+            我要連署...({item.petitions}/3)
           </button>
         </div>
-      )
+      ) 
     })
     const questionArray = this.state.questions.map((item,index) =>{
       // var q = "["+(item.genre)+"] "+(item.title)
@@ -193,9 +202,9 @@ class Homepage extends Component {
     //var sortarray = questions.concat().sort((b, a) => (a.num_comments) - (b.num_comments));
     var sortarray = this.state.questions.concat().sort((b,a) =>(a.num_comments - b.num_comments));
 
-    let raedy= false
+    let ready= false
     if (sortarray.length !== 0){
-      raedy = true
+      ready = true
     }
 
     var sectionStyle = {
@@ -204,7 +213,7 @@ class Homepage extends Component {
       backgroundPosition: "center 20%", 
       backgroundSize:"100%",
     };
-    if(raedy)
+    if(ready)
     return (
       <div className='container'>
         <div className="nav-scroller py-1 mb-2 bg-white">
