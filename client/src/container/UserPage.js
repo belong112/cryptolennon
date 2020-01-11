@@ -10,8 +10,8 @@ class Userpage extends Component {
       contract: this.props.contract,
       name: this.props.user.name,
       replies: [],
-      prequestions: [],
-      petition_threshld: 0
+      preQuestions: [],
+      petitionThreshold: 0
     };
   }
 
@@ -59,8 +59,8 @@ class Userpage extends Component {
       let t = await contract.methods.get_petition_threshold().call()
       this.setState({
         replies: array0,
-        prequestions: array1,
-        petitions: t
+        preQuestions: array1,
+        petitionThreshold: t
       })
     }catch(err){
       console.log('error')
@@ -96,7 +96,7 @@ class Userpage extends Component {
 
   render() {
     var comments = this.state.replies.concat().sort((a, b) => (b.time) - (a.time));
-    var prequestions = this.state.prequestions.concat();
+    var preQuestions = this.state.preQuestions.concat();
     const c = comments.map(item => {
       return(
         <Fragment>
@@ -107,12 +107,12 @@ class Userpage extends Component {
         </Fragment>
         )
     })
-    const preQ = prequestions.map((item, index) => {
+    const preQ = preQuestions.map((item, index) => {
       return(
         <div className={"d-flex justify-content-between align-items-center list-group-item "}>
           {item.title}
           <span>
-          目前進度...({item.n_sign}/3)
+          目前進度...({item.n_sign}/{this.state.petitionThreshold})
           </span>
           <button className="btn btn-warning btn-sm" onClick={() => this.uploadPrequestion(item.p_id)}>
           完成上架
