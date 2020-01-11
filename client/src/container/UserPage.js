@@ -53,7 +53,7 @@ class Userpage extends Component {
         if (x === '-1')
           break
         let prequestion = await contract.methods.get_prequestion(x).call()
-        array1.push({title:prequestion[0], n_sign:prequestion[5], p_id:p_id}) //Todo: n_sign->petition
+        array1.push({title:prequestion[0], n_sign:prequestion[5], p_id: x}) //Todo: n_sign->petition
         p_id = x
       }
       let t = await contract.methods.get_petition_threshold().call()
@@ -84,7 +84,7 @@ class Userpage extends Component {
       await contract.methods.create_question(p_id, Date.now()).send({'from': accounts[0]});
       swal.fire({
         icon: 'success',
-        title: '達到連署門檻囉！',
+        title: '達到連署門檻，以成功上架囉！',
       });
     }catch{
       swal.fire({
