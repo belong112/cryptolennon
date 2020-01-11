@@ -33,7 +33,8 @@ class CommentBoard extends Component {
         genre: 'Life',
         q_id: q_id,
         title: temp[0].toString(),
-        subtitle: 'N/A'
+        subtitle: temp[1].toString(),
+        imghash: temp[2].toString(),
       }
 
       // get reply
@@ -101,7 +102,7 @@ class CommentBoard extends Component {
     } else if (agree === null) {
       alert('你還沒選擇支持或反對')
     } else {
-      const time = getDateTime();
+      const time = Date.now();
       console.log(time)
       console.log(Date.now())
       var endorse = (agree === 'y' ? true : false)
@@ -158,12 +159,22 @@ class CommentBoard extends Component {
         )
     })
 
+    var sectionStyle = {
+      width: "100%",
+      height: "200px",
+      backgroundImage: `url(${"https://ipfs.io/ipfs/" + question.imghash})`,
+      backgroundPosition: "center 50%", 
+      backgroundSize: '100%',
+    };
+
     return (
       <div className='container bg-light pb-5 pt-4'>
         <div> 
-          <h6>每日一問:</h6>       
-          <h1>{question.title}?</h1>
-          <h6>{question.subtitle}</h6>
+          <div style={sectionStyle} className="pt-5">
+            <h6 className="stroke">每日一問:</h6>       
+            <h1 className="stroke">{question.title}?</h1>
+            <h6 className="stroke">{question.subtitle}</h6>            
+          </div>
           <hr/>   
           <div className="input-group mb-3 col-4">
             <div className="input-group-prepend">

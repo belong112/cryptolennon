@@ -166,7 +166,7 @@ class App extends Component {
     }
     const RegisterPage = (props) => { return ( <Registerpage handleregister={(a,b,c,d) => this.handleregister(a,b,c,d)} />)};
     const CommentPage = (props) => { return ( <CommentBoard  web3={this.state.web3} accounts={this.state.accounts} contract={this.state.contract} user={this.state.user} id={props.match.params.boardid} />)};
-    const UserPage = (props) =>{ return ( <Userpage  contract={this.state.contract} handleAccountChange={(a) => this.handleAccountChange(a)} user={this.state.user} />)};
+    const UserPage = (props) =>{ return ( <Userpage accounts={this.state.accounts} contract={this.state.contract} handleAccountChange={(a) => this.handleAccountChange(a)} user={this.state.user} />)};
     const HomePage = (props) =>{ return ( <Homepage web3={this.state.web3} accounts={this.state.accounts} contract={this.state.contract} user={this.state.user} />)}
     return (
       <BrowserRouter> 

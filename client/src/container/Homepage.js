@@ -1,8 +1,6 @@
 import React, { Component } from 'react';
 import {NavLink, Link} from "react-router-dom";
 
-import test1 from "../img/tsai.jpg"
-
 import swal from 'sweetalert2'
 
 class Homepage extends Component {
@@ -62,7 +60,8 @@ class Homepage extends Component {
           create_time: temp[4],
           owner_id: temp[4]
         }
-        temparray2.push(newitem)
+        if(newitem.petitions < 3)
+          temparray2.push(newitem)
       }
 
       this.setState({
@@ -97,13 +96,14 @@ class Homepage extends Component {
   handleSign = async (i) =>{
     const { contract,accounts } = this.state
     try{
-      await contract.methods.sign(i).send({from:accounts[0]})
-
       // check if 3 signs, if true => make question
-      const temp = await contract.methods.get_prequestion(i).call()
-      console.log(temp)
-      if(temp[4] === 3){
-        await contract.methods.create_question(i, Date.now()).send()
+      const prequestion = await contract.methods.get_prequestion(i).call()
+      console.log(prequestion)
+      if(prequestion[5] === '3'){
+       alert("已達聯署人數!")
+      }
+      else{
+        await contract.methods.sign(i).send({from:accounts[0]})
       }
     }catch(err){
       alert(err)
@@ -114,7 +114,7 @@ class Homepage extends Component {
   onSubmitPrequestion = async (e) => {
     e.preventDefault()
     const {genre, textarea, subtitle, preQuestions,contract,accounts} = this.state
-    let hash = 'QmbFwy'
+    let hash = ''
     try { 
       // send picture ipfs
       const IPFS = require('ipfs-api');
@@ -175,10 +175,10 @@ class Homepage extends Component {
   render() {
     const preQuestionArray = this.state.preQuestions.map((item,index) =>{
       return(
-        <div className="d-flex justify-content-between align-items-center list-group-item list-group-item-action" onClick={()=>alert(item.imghash)}>
+        <div className={"d-flex justify-content-between align-items-center list-group-item list-group-item-action "}>
           {item.title}
           <button className="btn btn-warning btn-sm" onClick={() => this.handleSign(index)}>
-            我要連署
+           我要連署 {item.petitions}/3 
           </button>
         </div>
       )
@@ -193,18 +193,19 @@ class Homepage extends Component {
     //var sortarray = questions.concat().sort((b, a) => (a.num_comments) - (b.num_comments));
     var sortarray = this.state.questions.concat().sort((b,a) =>(a.num_comments - b.num_comments));
 
-    let raedy= false
+    let ready= false
+    let sectionStyle = {}
     if (sortarray.length !== 0){
-      raedy = true
+      ready = true
+      sectionStyle = {
+        width: "100%",
+        backgroundImage: `url(${"https://ipfs.io/ipfs/" + sortarray[0].imghash})`,
+        backgroundPosition: "center 20%", 
+        backgroundSize:"100%",
+      };
     }
 
-    var sectionStyle = {
-      width: "100%",
-      backgroundImage:'url(https://i.imgur.com/G4EqeWr.jpg)',
-      backgroundPosition: "center 20%", 
-      backgroundSize:"100%",
-    };
-    if(raedy)
+    if(ready)
     return (
       <div className='container'>
         <div className="nav-scroller py-1 mb-2 bg-white">
@@ -291,8 +292,7 @@ class Homepage extends Component {
             <label>上傳圖片</label>
             <br/>
             <input type="file" className="" onChange={this.handleChangeFile} />
-          </div>
-          <img src= { `https://ipfs.io/ipfs/QmbFwywTUQ5NPxeW2KwftL59FQ7UQFRuw31EYqFUWpBNot` } alt="no_image" />
+          </div>          
           <p className='text-danger'>註 : 此動作需要約0.003eth</p>
           <button onClick={this.onSubmitPrequestion} className="btn btn-primary">送出</button> 
         </div>

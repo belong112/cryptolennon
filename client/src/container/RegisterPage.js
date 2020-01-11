@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import {Redirect} from 'react-router-dom'
 
 class Registerpage extends Component {
   constructor (props) {
@@ -7,7 +8,8 @@ class Registerpage extends Component {
       name: "",
       month: 1,
       year: 1900,
-      day: 1
+      day: 1,
+      redirectToHome: false,
     };
   }
 
@@ -16,7 +18,6 @@ class Registerpage extends Component {
       name:e.target.value
     })
   }
-
   monthchange = (e) =>{
     this.setState({
       month:e.target.value
@@ -33,14 +34,18 @@ class Registerpage extends Component {
     })
   }
 
-  onSubmit = () =>{
+  onSubmit = async () =>{
     const {name, year, month, day} = this.state
-    this.props.handleregister(name, day, month, year)
+    await this.props.handleregister(name, day, month, year)
+    this.setState({
+      redirectToHome:true
+    })
   }
 
-
-
   render() {
+    if (this.state.redirectToHome === true) {
+      return <Redirect to="/user" />
+    }
     return (
       <div className="container">
         <div className="py-5 text-center">          
