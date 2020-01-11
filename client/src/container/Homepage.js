@@ -1,8 +1,6 @@
 import React, { Component } from 'react';
 import {NavLink, Link} from "react-router-dom";
 
-import test1 from "../img/tsai.jpg"
-
 import swal from 'sweetalert2'
 
 class Homepage extends Component {
@@ -62,7 +60,8 @@ class Homepage extends Component {
           create_time: temp[4],
           owner_id: temp[4]
         }
-        temparray2.push(newitem)
+        if(newitem.petitions < 3)
+          temparray2.push(newitem)
       }
 
       this.setState({
@@ -123,7 +122,7 @@ class Homepage extends Component {
   onSubmitPrequestion = async (e) => {
     e.preventDefault()
     const {genre, textarea, subtitle, preQuestions,contract,accounts} = this.state
-    let hash = 'QmbFwy'
+    let hash = ''
     try { 
       // send picture ipfs
       const IPFS = require('ipfs-api');
@@ -203,16 +202,17 @@ class Homepage extends Component {
     var sortarray = this.state.questions.concat().sort((b,a) =>(a.num_comments - b.num_comments));
 
     let ready= false
+    let sectionStyle = {}
     if (sortarray.length !== 0){
       ready = true
+      sectionStyle = {
+        width: "100%",
+        backgroundImage: `url(${"https://ipfs.io/ipfs/" + sortarray[0].imghash})`,
+        backgroundPosition: "center 20%", 
+        backgroundSize:"100%",
+      };
     }
 
-    var sectionStyle = {
-      width: "100%",
-      backgroundImage:'url(https://i.imgur.com/G4EqeWr.jpg)',
-      backgroundPosition: "center 20%", 
-      backgroundSize:"100%",
-    };
     if(ready)
     return (
       <div className='container'>
@@ -300,8 +300,7 @@ class Homepage extends Component {
             <label>上傳圖片</label>
             <br/>
             <input type="file" className="" onChange={this.handleChangeFile} />
-          </div>
-          <img src= { `https://ipfs.io/ipfs/QmbFwywTUQ5NPxeW2KwftL59FQ7UQFRuw31EYqFUWpBNot` } alt="no_image" />
+          </div>          
           <p className='text-danger'>註 : 此動作需要約0.003eth</p>
           <button onClick={this.onSubmitPrequestion} className="btn btn-primary">送出</button> 
         </div>

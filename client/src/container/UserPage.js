@@ -3,7 +3,8 @@ import React, { Fragment, Component } from 'react';
 class Userpage extends Component {
   constructor (props) {
     super(props);
-    this.state = {       
+    this.state = {     
+      accounts: this.props.accounts,  
       contract: this.props.contract,
       name: this.props.user.name,
       replies: [],
@@ -23,6 +24,12 @@ class Userpage extends Component {
     this.props.handleAccountChange(name)
   }
 
+  postQuestion = (q_id) =>{
+    const {accounts, contract} = this.state
+    alert('fc u')
+    contract.methods.create_question(q_id,Date.now()).send({'from':accounts[0]})
+  }
+
   componentDidMount = async () =>{
     try{
       const {accounts, contract} = this.state
@@ -31,8 +38,11 @@ class Userpage extends Component {
       var array0 = []
       var p_id = -1
       var array1 = []
+      //get replies
       while(true){
+        console.log(accounts[0])
         let x =  await contract.methods.get_all_replies(q_id, r_id).call({'from': accounts[0]})
+        console.log('x:',x)
         if (x[0] === '-1' && x[1] === '-1')
           break
         let question = await contract.methods.get_question(x[0]).call()
@@ -41,12 +51,13 @@ class Userpage extends Component {
         q_id = x[0]
         r_id = x[1]     
       }
+      //get prequestion
       while(true){
         let x = await contract.methods.get_all_prequestions(p_id).call({'from': accounts[0]})
         if (x === '-1')
           break
         let prequestion = await contract.methods.get_prequestion(x).call()
-        array1.push({p:prequestion[0], n_sign:prequestion[5]})
+        array1.push({title:prequestion[0], n_sign:prequestion[5], p_id:p_id})
         p_id = x
       }
       let t = await contract.methods.get_petition_threshold().call()
@@ -61,8 +72,9 @@ class Userpage extends Component {
   }
 
   render() {
-    var temp = this.state.replies.concat().sort((a, b) => (b.time) - (a.time));
-    const comments = temp.map(item => {
+    var comments = this.state.replies.concat().sort((a, b) => (b.time) - (a.time));
+    var prequestions = this.state.prequestions.concat()
+    const c = comments.map(item => {
       return(
         <Fragment>
           <tr>
@@ -71,6 +83,13 @@ class Userpage extends Component {
           </tr>
         </Fragment>
         )
+    })
+    const preQ = prequestions.map(item => {
+      return(
+        <div className={"d-flex justify-content-between align-items-center list-group-item "}>
+          {item.title}
+        </div>
+      )
     })
     return (
       <div className="container">
@@ -85,6 +104,10 @@ class Userpage extends Component {
           </div>          
           <button onClick={this.onSubmit} className="btn btn-outline-secondary">更新</button>
         </div>
+        <div className='my-5'>
+          <h4>發布問題</h4>
+          {preQ}
+        </div>
         <div className="my-5">
           <h4>歷史紀錄</h4>
           <div className="table-wrapper-scroll-y">
@@ -96,7 +119,7 @@ class Userpage extends Component {
                 </tr>
               </thead>
               <tbody>
-                {comments}
+                {c}
               </tbody>
             </table>
           </div>
