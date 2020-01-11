@@ -60,8 +60,7 @@ class Homepage extends Component {
           create_time: temp[4],
           owner_id: temp[4]
         }
-        if(newitem.petitions < 3)
-          temparray2.push(newitem)
+        temparray2.push(newitem)
       }
 
       this.setState({

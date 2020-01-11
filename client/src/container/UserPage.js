@@ -36,9 +36,7 @@ class Userpage extends Component {
       var array1 = []
       //get replies
       while(true){
-        console.log(accounts[0])
         let x =  await contract.methods.get_all_replies(q_id, r_id).call({'from': accounts[0]})
-        console.log('x:',x)
         if (x[0] === '-1' && x[1] === '-1')
           break
         let question = await contract.methods.get_question(x[0]).call()
@@ -50,6 +48,7 @@ class Userpage extends Component {
       //get prequestion
       while(true){
         let x = await contract.methods.get_all_prequestions(p_id).call({'from': accounts[0]})
+        console.log('x ', x)
         if (x === '-1')
           break
         let prequestion = await contract.methods.get_prequestion(x).call()
@@ -97,6 +96,7 @@ class Userpage extends Component {
   render() {
     var comments = this.state.replies.concat().sort((a, b) => (b.time) - (a.time));
     var prequestions = this.state.prequestions.concat();
+    console.log(prequestions)
     const c = comments.map(item => {
       return(
         <Fragment>
@@ -114,7 +114,7 @@ class Userpage extends Component {
           <span>
           目前進度...({item.n_sign}/3)
           </span>
-          <button className="btn btn-warning btn-sm" onClick={() => this.uploadPrequestion(item.p_id)}>
+          <button className="btn btn-warning btn-sm" onClick={() => {this.uploadPrequestion(item.p_id)}}>
           完成上架
           </button>
         </div>
