@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import {NavLink, Link} from "react-router-dom";
 
-import swal from 'sweetalert2'
+import swal from 'sweetalert2';
 
 class Homepage extends Component {
    constructor (props) {

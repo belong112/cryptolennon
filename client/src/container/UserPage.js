@@ -1,5 +1,7 @@
 import React, { Fragment, Component } from 'react';
 
+import swal from 'sweetalert2';
+
 class Userpage extends Component {
   constructor (props) {
     super(props);
@@ -22,12 +24,6 @@ class Userpage extends Component {
   onSubmit = () =>{
     const {name} = this.state
     this.props.handleAccountChange(name)
-  }
-
-  postQuestion = (q_id) =>{
-    const {accounts, contract} = this.state
-    alert('fc u')
-    contract.methods.create_question(q_id,Date.now()).send({'from':accounts[0]})
   }
 
   componentDidMount = async () =>{
@@ -57,7 +53,7 @@ class Userpage extends Component {
         if (x === '-1')
           break
         let prequestion = await contract.methods.get_prequestion(x).call()
-        array1.push({title:prequestion[0], n_sign:prequestion[5], p_id:p_id})
+        array1.push({title:prequestion[0], n_sign:prequestion[5], p_id:p_id}) //Todo: n_sign->petition
         p_id = x
       }
       let t = await contract.methods.get_petition_threshold().call()
@@ -71,9 +67,36 @@ class Userpage extends Component {
     }
   }
 
+  uploadPrequestion = async (p_id) => {
+    const { contract,accounts } = this.state;
+    
+    // 判斷連署人數夠不夠
+    // const prequestion = await contract.methods.get_prequestion(p_id).call();
+    // if(prequestion[5] < 3) {
+    //   swal.fire({
+    //     icon: 'warning',
+    //     title: '連署人數不夠喔！',
+    //   });
+    //   return;
+    // }
+
+    try{
+      await contract.methods.create_question(p_id, Date.now()).send({'from': accounts[0]});
+      swal.fire({
+        icon: 'success',
+        title: '達到連署門檻囉！',
+      });
+    }catch{
+      swal.fire({
+        icon: 'warning',
+        title: '上架發生錯誤！(可能是連署人數不夠喔！）',
+      });
+    }
+  }
+
   render() {
     var comments = this.state.replies.concat().sort((a, b) => (b.time) - (a.time));
-    var prequestions = this.state.prequestions.concat()
+    var prequestions = this.state.prequestions.concat();
     const c = comments.map(item => {
       return(
         <Fragment>
@@ -84,10 +107,16 @@ class Userpage extends Component {
         </Fragment>
         )
     })
-    const preQ = prequestions.map(item => {
+    const preQ = prequestions.map((item, index) => {
       return(
         <div className={"d-flex justify-content-between align-items-center list-group-item "}>
           {item.title}
+          <span>
+          目前進度...({item.n_sign}/3)
+          </span>
+          <button className="btn btn-warning btn-sm" onClick={() => this.uploadPrequestion(item.p_id)}>
+          完成上架
+          </button>
         </div>
       )
     })
@@ -104,8 +133,9 @@ class Userpage extends Component {
           </div>          
           <button onClick={this.onSubmit} className="btn btn-outline-secondary">更新</button>
         </div>
+        
         <div className='my-5'>
-          <h4>發布問題</h4>
+          <h4>連署中問題</h4>
           {preQ}
         </div>
         <div className="my-5">
