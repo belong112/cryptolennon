@@ -15,6 +15,7 @@ class Homepage extends Component {
       subtitle: "",
       questions: [],
       preQuestions: [],
+      petitionThreshold: 0,
       user: this.props.user,
       buffer: null,
       ipfsHash: null
@@ -63,9 +64,12 @@ class Homepage extends Component {
         temparray2.push(newitem)
       }
 
+      let t = await contract.methods.get_petition_threshold().call()
+
       this.setState({
         questions: temparray,
-        preQuestions: temparray2
+        preQuestions: temparray2,
+        petitionThreshold: t
       })
 
     } catch (error) {
@@ -139,14 +143,18 @@ class Homepage extends Component {
 
       await ipfs.files.add(this.state.buffer, async (error, result) => {
         if(error) {
-          console.error(error)
+          console.error(error);
           return
         }
         hash = result[0].hash 
-        console.log('hash ',hash)
         var time = Date.now()
-        console.log(time)
-        await contract.methods.create_prequestion(textarea, subtitle, hash, time).send({from:accounts[0]})
+        await contract.methods.create_prequestion(textarea, subtitle, hash, time).send({from:accounts[0]});
+        swal.fire({
+          icon: 'success',
+          title: '送出成功',
+          text: '問題要先經過連署 => 超過一定門檻 => 到個人頁面就可以正式發佈喔！',
+        });
+
       })
       // var time = Date.now()
       // console.log(time)
@@ -185,7 +193,7 @@ class Homepage extends Component {
         <div className="d-flex justify-content-between align-items-center list-group-item list-group-item-action">
           {item.title}
           <button className="btn btn-warning btn-sm" onClick={() => this.handleSign(index)}>
-            我要連署...({item.petitions}/3)
+            我要連署...({item.petitions}/{this.state.petitionThreshold})
           </button>
         </div>
       ) 

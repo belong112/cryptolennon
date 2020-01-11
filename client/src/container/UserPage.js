@@ -10,8 +10,8 @@ class Userpage extends Component {
       contract: this.props.contract,
       name: this.props.user.name,
       replies: [],
-      prequestions: [],
-      petition_threshld: 0
+      preQuestions: [],
+      petitionThreshold: 0
     };
   }
 
@@ -52,14 +52,14 @@ class Userpage extends Component {
         if (x === '-1')
           break
         let prequestion = await contract.methods.get_prequestion(x).call()
-        array1.push({title:prequestion[0], n_sign:prequestion[5], p_id:p_id}) //Todo: n_sign->petition
+        array1.push({title:prequestion[0], n_sign:prequestion[5], p_id: x}) //Todo: n_sign->petition
         p_id = x
       }
       let t = await contract.methods.get_petition_threshold().call()
       this.setState({
         replies: array0,
-        prequestions: array1,
-        petitions: t
+        preQuestions: array1,
+        petitionThreshold: t
       })
     }catch(err){
       console.log('error')
@@ -83,7 +83,7 @@ class Userpage extends Component {
       await contract.methods.create_question(p_id, Date.now()).send({'from': accounts[0]});
       swal.fire({
         icon: 'success',
-        title: '達到連署門檻囉！',
+        title: '達到連署門檻，以成功上架囉！',
       });
     }catch{
       swal.fire({
@@ -96,7 +96,6 @@ class Userpage extends Component {
   render() {
     var comments = this.state.replies.concat().sort((a, b) => (b.time) - (a.time));
     var prequestions = this.state.prequestions.concat();
-    console.log(prequestions)
     const c = comments.map(item => {
       return(
         <Fragment>
@@ -107,12 +106,12 @@ class Userpage extends Component {
         </Fragment>
         )
     })
-    const preQ = prequestions.map((item, index) => {
+    const preQ = preQuestions.map((item, index) => {
       return(
         <div className={"d-flex justify-content-between align-items-center list-group-item "}>
           {item.title}
           <span>
-          目前進度...({item.n_sign}/3)
+          目前進度...({item.n_sign}/{this.state.petitionThreshold})
           </span>
           <button className="btn btn-warning btn-sm" onClick={() => {this.uploadPrequestion(item.p_id)}}>
           完成上架
