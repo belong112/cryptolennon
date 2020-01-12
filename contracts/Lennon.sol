@@ -183,10 +183,19 @@ contract Lennon is Ownable {
         return PreQuestions.length;
     }
 
-    // get prequestion given prequestionId (question, subtitle, picture_ipfs, create_time, owner_id, # sign)
-    function get_prequestion(uint _p_id) external view returns(string memory, string memory, string memory, uint, uint, uint) {
+    // get prequestion given prequestionId (question, subtitle, picture_ipfs, create_time, owner_id, # sign, and whether the account had signed)
+    function get_prequestion(uint _p_id) external view returns(string memory, string memory, string memory, uint, uint, uint, bool) {
         PreQuestion memory p = PreQuestions[_p_id];
-        return (p.question, p.subtitle, p.picture_ipfs, p.time, p.owner_id, p.petitions.length);
+        bool b = false;
+        if(owner_to_id[msg.sender] != 0){
+            for(uint i = 0; i < p.petitions.length; i++){
+                if(owner_to_id[msg.sender] == p.petitions[i]){
+                    b = true;
+                    break;
+                }
+            }
+        }
+        return (p.question, p.subtitle, p.picture_ipfs, p.time, p.owner_id, p.petitions.length, b);
     }
 
     // get petition threshold for changing a question into a prequestion
