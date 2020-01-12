@@ -50,7 +50,6 @@ class Userpage extends Component {
       //get prequestion
       while(true){
         let x = await contract.methods.get_all_prequestions(p_id).call({'from': accounts[0]})
-        console.log('x ', x)
         if (x === '-1')
           break
         let prequestion = await contract.methods.get_prequestion(x).call()
@@ -80,7 +79,6 @@ class Userpage extends Component {
       //get questions
       while(true){
         let x = await contract.methods.get_all_prequestions(p_id).call({'from': accounts[0]})
-        console.log('x ', x)
         if (x === '-1')
           break
         let prequestion = await contract.methods.get_prequestion(x).call()

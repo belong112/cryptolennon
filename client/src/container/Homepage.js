@@ -23,7 +23,7 @@ class Homepage extends Component {
   }
 
   componentDidMount = async () => {
-    const {contract} = this.state
+    const {contract,accounts} = this.state
     try {
       // get question
       var l = await contract.methods.get_question_length().call()
@@ -50,7 +50,8 @@ class Homepage extends Component {
 
       var temparray2= []
       for (i = 0; i < l; i++) {
-        temp = await contract.methods.get_prequestion(i).call()
+        temp = await contract.methods.get_prequestion(i).call( {'from': accounts[0]})
+        console.log(temp)
         const newitem = {
           id: i.toString(),
           genre: 'Life',
@@ -309,7 +310,8 @@ class Homepage extends Component {
                 {preQuestionArray}
               </div> 
             </div>
-          </div>  
+          </div> 
+          <div className="text-left text-muted text-sm">＊註：綠色按鈕代表自己已經連署過了，黃色的代表自己沒連署過</div> 
         </div>
         <hr/>
         <div className='mt-5'>
