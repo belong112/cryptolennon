@@ -211,14 +211,8 @@ contract Lennon is Ownable {
         return Questions[_q_id].replies.length;
     }
 
-    // get _r_idx(th) reply to _q_id(th) question (reply, endorse, time, owner_id and #likes)
-    function get_reply(uint _q_id, uint _r_idx ) external view returns(string memory, bool, uint, uint, uint) {
-        Reply memory r = Replies[Questions[_q_id].replies[_r_idx]];
-        return (r.reply, r.endorse, r.time, r.owner_id, r.likes.length);
-    }
-
     // get _r_idx(th) reply to _q_id(th) question (reply, endorse, time, owner_id, #likes, and whether the account liked it)
-    function get_reply_v2(uint _q_id, uint _r_idx ) external view returns(string memory, bool ,uint ,uint ,uint, bool) {
+    function get_reply(uint _q_id, uint _r_idx ) external view returns(string memory, bool ,uint ,uint ,uint, bool) {
         Reply memory r = Replies[Questions[_q_id].replies[_r_idx]];
         bool b = false;
         if( owner_to_id[msg.sender] != 0 ){
