@@ -61,7 +61,7 @@ class Registerpage extends Component {
           <div className="form-row">
             <div class="form-group col-4">
               <label for="exampleInputPassword1">年</label>
-              <input type="number" min="1900" max="2100" class="form-control" id="exampleInputPassword1" value={this.state.year} onChange={this.yearchange} />
+              <input type="number" min="1900" max="2020" class="form-control" id="exampleInputPassword1" value={this.state.year} onChange={this.yearchange} />
             </div>
             <div class="form-group col-4">
               <label for="exampleInputPassword1">月</label>

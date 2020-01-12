@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import {NavLink, Link} from "react-router-dom";
 
 import swal from 'sweetalert2';
+import WhatshotIcon from '@material-ui/icons/Whatshot';
 
 class Homepage extends Component {
    constructor (props) {
@@ -17,8 +18,7 @@ class Homepage extends Component {
       preQuestions: [],
       petitionThreshold: 0,
       user: this.props.user,
-      buffer: null,
-      ipfsHash: null
+      buffer: null
     }
   }
 
@@ -97,7 +97,7 @@ class Homepage extends Component {
 
   // 連署
   handleSign = async (i) =>{
-    const { contract,accounts } = this.state;
+    const { user,contract,accounts } = this.state;
     try{
       await contract.methods.sign(i).send({from:accounts[0]});
 
@@ -107,11 +107,20 @@ class Homepage extends Component {
         await this.petitionComplete(i);
       }
     }catch(err){
-      swal.fire({
-        icon: 'warning',
-        title: 'Oops...',
-        text: '連署錯誤了啦！你是不是要自肥啊？',
-      });
+      if(user.name === ''){
+        swal.fire({
+          icon: 'warning',
+          title: 'Oops...',
+          text: '要先創建帳號才能連署ㄡ!',
+        });
+      }
+      else{
+        swal.fire({
+          icon: 'warning',
+          title: 'Oops...',
+          text: '連署錯誤了啦！你是不是要自肥啊？',
+        });
+      }
     }
   }
 
@@ -182,34 +191,36 @@ class Homepage extends Component {
     this.setState({
       subtitle:"",
       textarea:"",
+      buffer: null,
+      genre: '-',
       preQuestions: temparray,
     });
   }
 
   render() {
-    const { contract, accounts } = this.state;
-    const preQuestionArray = this.state.preQuestions.map((item,index) =>{
+    const { contract, accounts, preQuestions, questions, petitionThreshold } = this.state;
+    const preQuestionArray = preQuestions.map((item,index) =>{
       return(
         <div className="d-flex justify-content-between align-items-center list-group-item list-group-item-action">
           {item.title}
           <button className="btn btn-warning btn-sm" onClick={() => this.handleSign(index)}>
-            我要連署...({item.petitions}/{this.state.petitionThreshold})
+            我要連署...({item.petitions}/{petitionThreshold})
           </button>
         </div>
       ) 
     })
-    const sortedQuestionArray = this.state.questions.concat().sort((b,a) =>(a.num_comments - b.num_comments));
+    const sortedQuestionArray = questions.concat().sort((b,a) =>(a.num_comments - b.num_comments));
     const questionArray = sortedQuestionArray.map((item,index) =>{
       // var q = "["+(item.genre)+"] "+(item.title)
       return(
-        <Link to={"/commentboard/"+(index)} className="d-flex justify-content-between align-items-center list-group-item list-group-item-action">{item.title}<span className={"badge badge-pill "+(item.num_comments > 10 ? 'badge-danger':'badge-secondary')}>{item.num_comments}</span></Link>
+        <Link to={"/commentboard/"+(item.id)} className="d-flex justify-content-between align-items-center list-group-item list-group-item-action">{item.title}<span className={"badge badge-pill "+(item.num_comments > 10 ? 'badge-danger':'badge-secondary')}>{item.num_comments}</span></Link>
       )
     })
 
     //var sortarray = questions.concat().sort((b, a) => (a.num_comments) - (b.num_comments));
-    var sortarray = this.state.questions.concat().sort((b,a) =>(a.num_comments - b.num_comments));
+    var sortarray = questions.concat().sort((b,a) =>(a.num_comments - b.num_comments));
 
-    let ready= false
+    let ready= false // to make sure array is loaded
     let sectionStyle = {}
     if (sortarray.length !== 0){
       ready = true
@@ -268,7 +279,7 @@ class Homepage extends Component {
                 <a className="nav-link active" id="home-tab" data-toggle="tab" href="#all" role="tab">所有問題</a>
               </li>
               <li className="nav-item">
-                <a className="nav-link" id="profile-tab" data-toggle="tab" href="#petition" role="tab">連署中問題</a>
+                <a className="nav-link" id="profile-tab" data-toggle="tab" href="#petition" role="tab">連署中問題 <WhatshotIcon fontSize='small' color='secondary'/></a>
               </li>
             </ul>
           </nav>

@@ -70,6 +70,7 @@ class Userpage extends Component {
       //get theeshold
       let t = await contract.methods.get_petition_threshold().call()
       this.setState({
+        name: this.props.user.name,
         replies: array0,
         questions: array2,
         preQuestions: array1,
@@ -172,22 +173,22 @@ class Userpage extends Component {
           <nav>
             <ul className="nav nav-tabs" id="myTab" role="tablist">
               <li className="nav-item">
-                <a className="nav-link active" id="home-tab" data-toggle="tab" href="#all" role="tab">已發布問題</a>
+                <a className="nav-link active" id="home-tab" data-toggle="tab" href="#all" role="tab">連署中問題</a>
               </li>
               <li className="nav-item">
-                <a className="nav-link" id="profile-tab" data-toggle="tab" href="#petition" role="tab">連署中問題</a>
+                <a className="nav-link" id="profile-tab" data-toggle="tab" href="#petition" role="tab">已發布問題</a>
               </li>
             </ul>
           </nav>
           <div className="tab-content" id="myTabContent">
             <div className="tab-pane fade show active" id="all" role="tabpanel" >
               <div className="list-group text-left">
-                {q}
+                {preQ}
               </div>
             </div>
             <div className="tab-pane fade" id="petition" role="tabpanel">
               <div className="list-group text-left">
-                {preQ}
+                {q}
               </div> 
             </div>
           </div>  

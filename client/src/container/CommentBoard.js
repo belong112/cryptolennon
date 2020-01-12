@@ -19,7 +19,7 @@ class CommentBoard extends Component {
       question: "",
       textarea: "",
       agree: 'y',
-      user: this.props.user
+      user: {}
       
     };
   }
@@ -51,11 +51,13 @@ class CommentBoard extends Component {
           time: temp[2],
           owner_id: temp[3],
           num_likes: parseInt(temp[4]),
+          liked: temp[5]
         }
         temparray.push(newitem)
       }
 
       this.setState({
+        user: this.props.user,
         question: question, //問題(data)
         comments: temparray, //回復(data)
         currentarray: temparray //當前頁面上的回覆
@@ -120,7 +122,20 @@ class CommentBoard extends Component {
         await contract.methods.create_reply(question.q_id, textarea, endorse, time).send({from: accounts[0]});
       }
       catch(err){
-        console.log("There is an error while create_reply:" + err);
+        if(err.code === 4001){
+          swal.fire({
+            icon: 'warning',
+            title: 'Oops...',
+            text: '怎麼又不留言了呢?',
+          });
+        }
+        else{
+          swal.fire({
+            icon: 'warning',
+            title: 'Oops...',
+            text: '要有帳號才能夠留言喔',
+          });
+        }
         return;
       }
       var l = comments.length
@@ -132,6 +147,7 @@ class CommentBoard extends Component {
         time: time,
         owner_id: this.state.user.id, 
         num_likes: 0,
+        liked: false
       });
     }
     this.setState({
@@ -142,18 +158,37 @@ class CommentBoard extends Component {
     });
   }
 
+  // 按讚
   handleCommentRespond = async(r_id) => {
-    const {comments, contract, accounts, question} = this.state;    
+    const {user, comments, contract, accounts, question} = this.state;    
     try{
       await contract.methods.like(question.q_id, r_id).send({from: accounts[0]})
       var new_comments = comments
       new_comments[r_id].num_likes+=1
+      new_comments[r_id].liked = true
     } catch(err){
-      swal.fire({
-        icon: 'warning',
-        title: 'Oops...',
-        text: '按了讚是不能收回的喔<3',
-      });
+      if(user.name === ""){
+        swal.fire({
+          icon: 'warning',
+          title: 'Oops...',
+          text: '要有帳號才能夠按讚喔',
+        });
+      }
+      else if(err.code === 4001){
+        swal.fire({
+          icon: 'warning',
+          title: 'Oops...',
+          text: '怎麼又不按讚了呢?',
+        });
+      }
+      else{
+        swal.fire({
+          icon: 'warning',
+          title: 'Oops...',
+          text: '按了讚是不能收回的喔<3',
+        });
+      }
+      return 
     }
     this.setState({
       //user:user,

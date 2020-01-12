@@ -58,7 +58,7 @@ class PostIt extends Component {
           <div className="buttongroup">
             <IconButton onClick={()=>{this.handleCommentRespond(this.props.item.id)}} spacing={2}>
               <Badge badgeContent={this.props.item.num_likes} color="primary">
-                <ThumbUpIcon color={(this.props.respond === 'positive' ? 'primary':'')} />
+                <ThumbUpIcon color={(this.props.item.liked === true ? 'primary':'')} />
               </Badge>
             </IconButton>            
           </div>
