@@ -58,8 +58,9 @@ class Homepage extends Component {
           subtitle: temp[1].toString(),
           imghash: temp[2].toString(),
           petitions: temp[5],
-          create_time: temp[4],
-          owner_id: temp[4]
+          create_time: temp[3],
+          owner_id: temp[4],
+          signed: temp[6],
         }
         temparray2.push(newitem)
       }
@@ -133,7 +134,7 @@ class Homepage extends Component {
   // 提交待聯署問題
   onSubmitPrequestion = async (e) => {
     e.preventDefault()
-    const {genre, textarea, subtitle, preQuestions,contract,accounts} = this.state
+    const { user, genre, textarea, subtitle, preQuestions,contract,accounts} = this.state
     let hash = ''
     try { 
       // send picture ipfs
@@ -152,7 +153,20 @@ class Homepage extends Component {
 
       await ipfs.files.add(this.state.buffer, async (error, result) => {
         if(error) {
-          console.error(error);
+          if(user.name === ""){
+            swal.fire({
+              icon: 'warning',
+              title: 'Oops...',
+              text: '要先創建帳號才能提問ㄡ!',
+            });
+          }
+          else{
+            swal.fire({
+              icon: 'warning',
+              title: 'Oops...',
+              text: '怪怪ㄉ',
+            });
+          }
           return
         }
         hash = result[0].hash 
@@ -186,7 +200,8 @@ class Homepage extends Component {
       title: textarea,
       subtitle: subtitle,
       imghash: hash,
-      petitions: 1
+      petitions: 1,
+      signed: true,
     });
     this.setState({
       subtitle:"",
@@ -203,7 +218,7 @@ class Homepage extends Component {
       return(
         <div className="d-flex justify-content-between align-items-center list-group-item list-group-item-action">
           {item.title}
-          <button className="btn btn-warning btn-sm" onClick={() => this.handleSign(index)}>
+          <button className={"btn btn-sm "+ (item.signed ? "btn-success" : "btn-warning")} onClick={() => this.handleSign(index)}>
             我要連署...({item.petitions}/{petitionThreshold})
           </button>
         </div>
